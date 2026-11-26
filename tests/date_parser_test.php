@@ -9,6 +9,15 @@ $now = new DateTimeImmutable('2026-11-10 09:00:00', new DateTimeZone('Europe/Ber
 $cases = [
     'Zahnarzt 20261112 1400' => ['2026-11-12 14:00', true],
     'Zahnarzt 261112 1530' => ['2026-11-12 15:30', true],
+    'Zahnarzt 261112' => ['2026-11-12 00:00', false],
+    'Zahnarzt 261112 1400' => ['2026-11-12 14:00', true],
+    'Besprechung 261112 14:30' => ['2026-11-12 14:30', true],
+    'Besprechung 261112 14 Uhr' => ['2026-11-12 14:00', true],
+    'Besprechung 261112 14.30 Uhr' => ['2026-11-12 14:30', true],
+    'Neujahr 270101 0915' => ['2027-01-01 09:15', true],
+    'Termin 261231 2345' => ['2026-12-31 23:45', true],
+    'Ungültiges Datum 261332 1400' => null,
+    'Ungültiger Februar 260230 1400' => null,
     'Zahnarzt 20261112 1430' => ['2026-11-12 14:30', true],
     'Zahnarzt 12.11.2026 14:30' => ['2026-11-12 14:30', true],
     'Zahnarzt 12.11.26 14.30 Uhr' => ['2026-11-12 14:30', true],
@@ -34,9 +43,21 @@ foreach ($cases as $title => $expected) {
     }
 }
 
-$cleaned = DateParser::withoutTime('Zahnarzt 261112 1530', new DateTimeImmutable('2026-11-12 15:30'));
-if ($cleaned !== 'Zahnarzt 261112') {
-    throw new RuntimeException('Time removal failed: ' . $cleaned);
+$cleanupCases = [
+    'Zahnarzt 261112 1530' => 'Zahnarzt 261112',
+    'Zahnarzt 20261112 1400' => 'Zahnarzt 20261112',
+    'Termin 12.11.2026 14:30' => 'Termin 12.11.2026',
+    'Termin 12.11.2026 14.30 Uhr' => 'Termin 12.11.2026',
+];
+foreach ($cleanupCases as $original => $expectedTitle) {
+    $parsed = DateParser::parse($original, $now);
+    if ($parsed === null || !$parsed[1]) {
+        throw new RuntimeException('Missing time: ' . $original);
+    }
+    $cleaned = DateParser::withoutTime($original, $parsed[0]);
+    if ($cleaned !== $expectedTitle) {
+        throw new RuntimeException('Time removal failed: ' . $original . ' -> ' . $cleaned);
+    }
 }
 
-echo 'DateParser: ' . count($cases) . " cases passed\n";
+echo 'DateParser: ' . count($cases) . ' parse cases and ' . count($cleanupCases) . " cleanup cases passed\n";

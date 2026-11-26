@@ -28,10 +28,19 @@ class TaskDateListener implements IEventListener {
         }
 
         try {
-            $calendar = $event->getCalendarData();
+            $calendarId = $event->getCalendarId();
             $object = $event->getObjectData();
+            $uri = $object['uri'] ?? null;
+            if (!is_string($uri) || $uri === '') {
+                return;
+            }
 
-            $vobj = Reader::read($object['calendardata']);
+            // OCP calendar events supply metadata, not necessarily calendardata.
+            $stored = $this->backend->getCalendarObject($calendarId, $uri);
+            if (!is_array($stored) || !isset($stored['calendardata']) || !is_string($stored['calendardata'])) {
+                return;
+            }
+            $vobj = Reader::read($stored['calendardata']);
             $todo = $vobj->VTODO ?? null;
             if ($todo === null || !isset($todo->SUMMARY)) {
                 return;
@@ -51,7 +60,7 @@ class TaskDateListener implements IEventListener {
                 if ($managed && $currentDue !== null) {
                     unset($todo->DUE);
                     unset($todo->{self::AUTO_DUE_PROPERTY});
-                    $this->backend->updateCalendarObject((int)$calendar['id'], $object['uri'], $vobj->serialize());
+                    $this->backend->updateCalendarObject($calendarId, $uri, $vobj->serialize());
                 }
                 return;
             }
@@ -89,8 +98,8 @@ class TaskDateListener implements IEventListener {
             }
 
             $this->backend->updateCalendarObject(
-                (int)$calendar['id'],
-                $object['uri'],
+                $calendarId,
+                $uri,
                 $vobj->serialize()
             );
         } catch (\Throwable $e) {

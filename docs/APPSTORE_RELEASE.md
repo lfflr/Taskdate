@@ -5,13 +5,13 @@
 Repository: https://github.com/lfflr/Taskdate
 Development branch: release/appstore-readiness-2026-11-26
 
-**NOT RELEASED.** No App Store registration, certificate, signed release or live Nextcloud 35 integration test is confirmed.
+**NOT RELEASED.** Version 0.2.3 in metadata is a prerelease candidate, not a stable/public claim. No App Store registration, certificate, signed release or live Nextcloud 35 integration test is confirmed.
 
 ## Before approval
 
 - [ ] Run the PHP checks and review CI evidence.
 - [ ] Test task creation and edits against a disposable Nextcloud 35 test installation, including CalDAV update events, title cleanup, timezone, START/DUE handling and recurring tasks.
-- [ ] Replace internal Nextcloud class dependency `OCA\DAV\CalDAV\CalDavBackend` with a compliant supported public interface or secure supported integration. App Store policy requires public APIs.
+- [ ] The documented public calendar API is read-only for existing objects; design and validate a supported task update path before release. Do not assume ICreateFromString is an update API. Replace internal Nextcloud class dependency `OCA\DAV\CalDAV\CalDavBackend` with a compliant supported public interface or secure supported integration. App Store policy requires public APIs.
 - [ ] Confirm the licensing and rights for all code; the repository LICENSE is GPL-3.0 while current appinfo describes AGPL. Do not silently relicense.
 - [ ] Add an app icon (`img/app.svg`) and screenshots, then verify correct rendering.
 - [ ] Review description, contact / issue URL, and author identification.

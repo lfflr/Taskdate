@@ -1,0 +1,21 @@
+name: PHP checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax-and-parser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring
+          coverage: none
+      - name: PHP syntax
+        run: find lib tests -name '*.php' -print -exec php -l {} \;
+      - name: Parser tests
+        run: php tests/date_parser_test.php

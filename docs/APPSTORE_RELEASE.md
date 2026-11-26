@@ -10,7 +10,7 @@ Development branch: release/appstore-readiness-2026-11-26
 ## Before approval
 
 - [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).
-- [ ] Review latest expanded parser regression workflow result before merge.
+- [x] Expanded parser regression workflow passed on commit 8361851f266b708b4bebdc5e4a681ee95ce0077a (GitHub Actions run 45819377473).
 - [ ] Test task creation and edits against a disposable Nextcloud 35 test installation, including CalDAV update events, title cleanup, timezone, START/DUE handling and recurring tasks.
 - [ ] Exercise `Zahnarzt 261112 1530`, confirm DUE 2026-11-12 15:30 and SUMMARY `Zahnarzt 261112`.
 - [ ] Verify existing manual DUE remains unchanged, including after changing SUMMARY.

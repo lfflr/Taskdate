@@ -30,6 +30,10 @@ openssl req -nodes -newkey rsa:4096 -keyout taskdate.key -out taskdate.csr -subj
 
 Keep taskdate.key offline/private. Only submit taskdate.csr.
 
+## Prepare runtime-only staging
+
+Run `bash scripts/prepare-release.sh` to create `dist/taskdate` containing only the runtime app. Do not upload or publish this directory before signing. The script deliberately excludes `.github/`, `tests/`, and private keys.
+
 ## Signing (after certificate approval)
 
 ```bash

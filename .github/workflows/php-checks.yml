@@ -16,6 +16,6 @@ jobs:
           extensions: mbstring
           coverage: none
       - name: PHP syntax
-        run: find lib tests -name '*.php' -print -exec php -l {} \;
+        run: find lib tests -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Parser tests
         run: php tests/date_parser_test.php

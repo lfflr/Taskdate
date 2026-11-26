@@ -6,7 +6,7 @@ Nextcloud-App zur automatischen Erkennung von Datumsangaben im Titel einer Aufga
 
 Die Dateien aus diesem Repository in `custom_apps/taskdate` der Nextcloud-Installation ablegen und anschließend als Administrator aktivieren, beispielsweise mit `php occ app:enable taskdate`.
 
-**Testversion 0.2.2:** Die App deklariert Nextcloud **33–35**. Die Nextcloud-35-Kompatibilität ist noch **nicht durch einen echten CalDAV-Integrationstest bestätigt**. Vor der produktiven Nutzung auf einer Testinstanz ausprobieren.
+**Entwicklungskandidat 0.2.3 (PR #1, kein freigegebenes Release):** Die App deklariert Nextcloud **33–35**. Die Nextcloud-35-Kompatibilität ist noch **nicht durch einen echten CalDAV-Integrationstest bestätigt**. Vor der produktiven Nutzung auf einer Testinstanz ausprobieren.
 
 ## Erkennung
 
@@ -38,3 +38,10 @@ Eine minimale Praxisprüfung auf Nextcloud 35:
 Die PHP-Laufzeit steht in der Entwicklungsumgebung derzeit nicht zur Verfügung; PHP-Syntaxprüfung und obige Testfälle sind daher noch auszuführen. Ein Test gegen eine echte Nextcloud-/CalDAV-Instanz steht ebenfalls aus. Insbesondere Zeitzonen, Wiederholungsaufgaben und die Verarbeitung externer Aufgabenclients bleiben zu prüfen.
 
 Die ursprüngliche Metadaten-Lizenz lautet `agpl`, während das Repository eine GPL-3.0-Lizenzdatei enthält. Diese Inkonsistenz sollte mit dem Rechteinhaber geklärt werden.
+
+## Nextcloud App Store / Entwicklung
+
+Die Vorbereitungen und aktuellen Freigabeblocker stehen in [docs/APPSTORE_RELEASE.md](docs/APPSTORE_RELEASE.md).
+Der Entwicklungsstand wird in [PR #1](https://github.com/lfflr/Taskdate/pull/1) erarbeitet.
+PHP-Syntax und erweiterte Parser-Regressionen wurden mit [GitHub Actions run 45819377473](https://github.com/lfflr/Taskdate/actions/runs/45819377473) bestanden.
+Das bestätigt **nicht** die Integrationsfähigkeit des Listeners: Eine produktive Veröffentlichung erfordert noch die Überprüfung und ggf. den Ersatz der internen CalDAV-Schreibschnittstelle, einen Nextcloud-35-Praxistest und die App-Signatur.

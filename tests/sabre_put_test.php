@@ -99,4 +99,46 @@ $event = str_replace(['BEGIN:VTODO', 'END:VTODO'], ['BEGIN:VEVENT', 'END:VEVENT'
 if ($after !== $event) {
     throw new RuntimeException('VEVENT unexpectedly rewritten');
 }
-echo "TaskDate SabreDAV request tests: 5 rewrites, 5 exclusions passed\n";
+
+// Real request-body streams are consumed by getBodyAsString(). All paths must
+// preserve an unchanged payload after inspection, including malformed ICS.
+$streamCases = [
+    taskIcs('Manually scheduled 261112 1530', '20261112T090000'),
+    taskIcs('Recurring 261112 1530', null, null, 'RRULE:FREQ=DAILY'),
+    "this is not valid iCalendar\r\n",
+];
+foreach ($streamCases as $i => $input) {
+    $handle = fopen('php://temp', 'w+');
+    if ($handle === false) {
+        throw new RuntimeException('Could not create stream');
+    }
+    fwrite($handle, $input);
+    rewind($handle);
+    $request = new Request('PUT', '/remote.php/dav/calendars/alice/tasks/stream.ics', [
+        'Content-Type' => 'text/calendar',
+        'Content-Length' => (string)strlen($input),
+    ], $handle);
+    $request->setBaseUrl('/remote.php/dav/');
+    (new TaskDateSabrePlugin())->handlePut($request, new Response());
+    if ($request->getBodyAsString() !== $input) {
+        throw new RuntimeException("Stream case $i lost original body");
+    }
+    fclose($handle);
+}
+
+$input = taskIcs('Stream test 261112 1530');
+$stream = fopen('php://temp', 'w+');
+fwrite($stream, $input);
+rewind($stream);
+$request = new Request('PUT', '/remote.php/dav/calendars/alice/tasks/new.ics', [
+    'Content-Type' => 'text/calendar', 'Content-Length' => (string)strlen($input),
+], $stream);
+$request->setBaseUrl('/remote.php/dav/');
+(new TaskDateSabrePlugin())->handlePut($request, new Response());
+if ((string)Reader::read($request->getBodyAsString())->VTODO->SUMMARY !== 'Stream test 261112') {
+    throw new RuntimeException('Stream rewrite failed');
+}
+fclose($stream);
+
+echo "TaskDate SabreDAV request tests: 5 rewrites, 5 exclusions, 4 stream cases passed\n";
+

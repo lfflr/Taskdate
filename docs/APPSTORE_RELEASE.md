@@ -32,6 +32,10 @@ This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 comp
 - `tests/calendar_payload_test.php` checks payload validation; [CI run 45980616375](https://github.com/lfflr/Taskdate/actions/runs/45980616375) passed PHP syntax, parser, write-policy and payload tests. This is **not** a live Nextcloud event-dispatch integration test.
 - The listener still writes with `OCA\\DAV\\CalDAV\\CalDavBackend::updateCalendarObject`. Public API and App Store compatibility remain blocked and must be investigated independently.
 
+## Packaging checks (2026-11-27)
+
+A new `tests/release_staging_test.sh` validates unsigned staging structure and basic appinfo metadata, and is now invoked from the PHP CI workflow. The script does **not** sign the release or validate it against the official Nextcloud appinfo schema. Do not interpret a green staging test as App Store approval.
+
 ## Before approval
 
 - [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).
@@ -72,16 +76,17 @@ Keep taskdate.key offline/private. Only submit taskdate.csr.
 
 ## Prepare runtime-only staging
 
-Run `bash scripts/prepare-release.sh` to create `dist/taskdate` containing only the runtime app. Do not upload or publish this directory before signing. The script deliberately excludes `.github/`, `tests/`, and private keys.
+Run `bash scripts/prepare-release.sh` to create `dist/taskdate` containing runtime files **and the repository LICENSE file**. Do not upload or publish this directory before signing. The script deliberately excludes `.github/`, `tests/`, and private keys.
 
 ## Signing (after certificate approval)
 
 ```bash
 php occ integrity:sign-app --privateKey=/secure/taskdate.key --certificate=/secure/taskdate.crt --path=/absolute/path/to/taskdate
+cd /absolute/path/to/dist
 tar -czf taskdate.tar.gz taskdate
 ```
 
-Use a clean staging directory containing only runtime files; no tests, GitHub workflows or private keys. Run the signing command **before** archiving, and do not edit any signed files.
+Use a clean staging directory containing runtime files and LICENSE; no tests, GitHub workflows or private keys. Run the signing command **before** archiving, and do not edit any signed files.
 
 Official Nextcloud documentation:
 - https://docs.nextcloud.com/server/stable/developer_manual/app_publishing_maintenance/release_process.html

@@ -8,6 +8,12 @@ namespace OCA\TaskDate;
  * Empty and non-string payloads are intentionally rejected.
  */
 final class CalendarPayload {
+    /** Return false only when the event explicitly identifies a non-task component. */
+    public static function mayContainTodo(array $object): bool {
+        $component = $object['component'] ?? null;
+        return !is_string($component) || $component === '' || strtoupper($component) === 'VTODO';
+    }
+
     public static function calendarData(array $object): ?string {
         $data = $object['calendardata'] ?? null;
         return is_string($data) && $data !== '' ? $data : null;

@@ -1,4 +1,4 @@
-name: Nextcloud 35 integration (isolated)
+name: Nextcloud 33-35 integration (isolated)
 on:
   pull_request:
     paths:
@@ -8,9 +8,13 @@ on:
 permissions:
   contents: read
 jobs:
-  caldav-nextcloud35:
+  caldav-nextcloud:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        nextcloud: [33, 34, 35]
     steps:
       - uses: actions/checkout@v4
       - name: Prepare unsigned runtime package
@@ -22,7 +26,7 @@ jobs:
             -e NEXTCLOUD_ADMIN_PASSWORD=taskdate-e2e-test \
             -e SQLITE_DATABASE=nextcloud \
             -e NEXTCLOUD_TRUSTED_DOMAINS=127.0.0.1:18085 \
-            nextcloud:35-apache
+            nextcloud:${{ matrix.nextcloud }}-apache
       - name: Wait for automatic Nextcloud installation
         run: |
           ready=0
@@ -37,6 +41,10 @@ jobs:
             docker logs --tail 100 taskdate-nc35
             exit 1
           fi
+      - name: Verify Nextcloud major version
+        run: |
+          docker exec -u www-data taskdate-nc35 php occ status --output=json | tee "$RUNNER_TEMP/nextcloud-status.json"
+          grep -Eq '"versionstring":"${{ matrix.nextcloud }}\\.' "$RUNNER_TEMP/nextcloud-status.json"
       - name: Install TaskDate from staged runtime files
         run: |
           docker cp "$RUNNER_TEMP/stage/taskdate" taskdate-nc35:/var/www/html/custom_apps/taskdate

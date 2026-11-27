@@ -21,7 +21,7 @@ $cases = [
     ['Zahnarzt 261112 1530', '20261112T140000', '20261112T153000', null],
     ['Zahnarzt 261112', '20261112', '20261112', null],
     ['Zahnarzt 261113', '20261112', '20261112', ['due' => '20261113', 'summary' => 'Zahnarzt 261113']],
-    ['Zahnarzt 261112 1530', null, '20261111', ['due' => '20261112T153000', 'summary' => 'Zahnarzt 261112']],
+    ['Zahnarzt 261112 1530', null, '20261111', null], // manual DUE deletion
 ];
 foreach ($cases as $i => [$summary, $due, $managedDue, $expected]) {
     $actual = TaskUpdatePlanner::plan($summary, $due, $managedDue, $now);

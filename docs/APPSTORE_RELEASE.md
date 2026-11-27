@@ -26,15 +26,20 @@ This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 comp
 
 ## Event payload handling (2026-11-27)
 
-- Prefer the current event's `getObjectData()['calendardata']`, which the Nextcloud DAV backend normally provides.
+- Consume the current event's `getObjectData()['calendardata']` only if it is supplied; the event metadata does **not** guarantee this field. The backend fallback remains necessary.
 - If missing, fall back to `getCalendarObject`, still an **internal** DAV dependency.
 - Reject absent/empty/non-string URIs and raw iCalendar payloads without trying to parse them.
+- Ignore objects whose event `component` explicitly identifies `VEVENT`/`VJOURNAL` rather than `VTODO`. With missing metadata, continue to inspect the parsed iCalendar component.
 - `tests/calendar_payload_test.php` checks payload validation; [CI run 45980616375](https://github.com/lfflr/Taskdate/actions/runs/45980616375) passed PHP syntax, parser, write-policy and payload tests. This is **not** a live Nextcloud event-dispatch integration test.
 - The listener still writes with `OCA\\DAV\\CalDAV\\CalDavBackend::updateCalendarObject`. Public API and App Store compatibility remain blocked and must be investigated independently.
 
 ## Packaging checks (2026-11-27)
 
 A new `tests/release_staging_test.sh` validates unsigned staging structure and basic appinfo metadata, and is now invoked from the PHP CI workflow. [Run 45994185733](https://github.com/lfflr/Taskdate/actions/runs/45994185733) passed all five checks: syntax, parser, safety policy, event payload, and staging smoke test. The script does **not** sign the release or validate it against the official Nextcloud appinfo schema. Do not interpret a green staging test as App Store approval.
+
+## Review note (2026-11-27)
+
+The previous description claiming that Nextcloud 35 events generally include `calendardata` was too strong. The listener now documents that event payloads may contain only metadata and therefore continues to use backend lookup for the raw object. The public OCP calendar event is useful for detecting changes, not proof of a public existing-object write API. No claim of App Store acceptance is made.
 
 ## Before approval
 

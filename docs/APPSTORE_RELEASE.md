@@ -15,6 +15,15 @@ Development branch: release/appstore-readiness-2026-11-26
 - Expanded HHMM parser regression tests and PHP syntax passed in [CI run 45940606432](https://github.com/lfflr/Taskdate/actions/runs/45940606432), commit `4f12096f4ec9923c85672edbb3db449da6fcf318`.
 - This remains a parser test, **not** a Nextcloud 35 integration test.
 
+## Safety policy added (2026-11-27)
+
+The listener now uses `TaskWritePolicy::allowsAutomaticDue()` and conservatively skips:
+- recurring VTODOs (`RRULE` or `RECURRENCE-ID`);
+- VTODOs with `DTSTART` until DTSTART/DUE ordering and timezone behavior are integration-tested;
+- items without `SUMMARY`.
+
+This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 compatibility. Task apps may populate `DTSTART` for ordinary tasks. The release remains blocked until that behavior is measured and a correct policy implemented. `tests/task_write_policy_test.php` documents the current safety contract.
+
 ## Before approval
 
 - [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).
@@ -23,7 +32,7 @@ Development branch: release/appstore-readiness-2026-11-26
 - [ ] Exercise `Zahnarzt 261112 1530`, confirm DUE 2026-11-12 15:30 and SUMMARY `Zahnarzt 261112`.
 - [ ] Verify existing manual DUE remains unchanged, including after changing SUMMARY.
 - [ ] Check that creating an event on a read-only/shared calendar is ignored without damage.
-- [ ] Check that tasks having DTSTART later than parsed DUE are handled without invalid iCalendar.
+- [ ] Verify how Nextcloud Tasks populates DTSTART; revise conservative skip to support normal tasks without allowing DUE earlier than DTSTART.
 - [ ] Check Europe/Berlin summer/winter timezone changes and recurrence behavior.
 - [ ] The documented public calendar API is read-only for existing objects; design and validate a supported task update path before release. Do not assume ICreateFromString is an update API. Replace internal Nextcloud class dependency `OCA\DAV\CalDAV\CalDavBackend` with a compliant supported public interface or secure supported integration. App Store policy requires public APIs.
 - [ ] Confirm the licensing and rights for all code; the repository LICENSE is GPL-3.0 while current appinfo describes AGPL. Do not silently relicense.

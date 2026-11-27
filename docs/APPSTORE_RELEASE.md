@@ -21,7 +21,7 @@ Verifizierte Quellcode-Bezüge:
 - https://github.com/sabre-io/dav/blob/master/lib/DAV/Server.php
 - https://github.com/sabre-io/http/blob/master/lib/Message.php
 
-**Achtung:** Die eigenständigen SabreDAV-Tests und der inzwischen erfolgreiche Docker-CalDAV-Test belegen den Schreibweg auf einer Nextcloud-35.0.3.2-Instanz. Die Nextcloud-Tasks-Oberfläche, externe Clients und andere Versionen bleiben trotzdem gesondert abzunehmen.
+**Achtung:** Die eigenständigen SabreDAV-Tests und der inzwischen erfolgreiche Docker-CalDAV-Test belegen den Schreibweg auf einer Nextcloud-35.0.3.2-Instanz. Auch die Nextcloud-Versionen 33 und 34 wurden inzwischen in Docker-CalDAV-Tests bestanden. Die Nextcloud-Tasks-Oberfläche, externe Clients und zeitbezogene Sonderfälle bleiben gesondert abzunehmen.
 
 ## 2. Behobene technische Punkte
 
@@ -54,7 +54,9 @@ Nachweise:
 
 **Erfolgreicher echter Nextcloud-35-CalDAV-Test:** [GitHub Actions #4](https://github.com/lfflr/Taskdate/actions/runs/46033274589), Commit `c5e164e16c05d20bbdd65793f77f10a6d5ae43d7`. Nextcloud 35.0.3.2 aus dem offiziellen Docker-Image wurde mit SQLite neu installiert; TaskDate 0.2.3 ließ sich aktivieren. Über authentifizierte CalDAV-`MKCALENDAR`, `PUT` und `GET` wurden folgende Fälle erfolgreich geprüft: Fälligkeit+Titelbereinigung, Datumsänderung mit Uhrzeiterhalt, manuelle Fälligkeiten, DTSTART-Schutz, ganztägiges DUE, manuelle DUE-Entfernung trotz bestehendem Marker und Abweisung falscher Anmeldedaten. Kein Nutzer-Produktivsystem wurde verändert.
 
-**Testgrenzen:** Dieser automatisierte Test nutzt direkte HTTP-Requests und keinen echten Nextcloud-Tasks-Browserlauf; die Tests laufen in einer frischen SQLite-Testinstanz mit Admin-Kalender und prüfen nicht geteilte oder schreibgeschützte Kalender, MariaDB/PostgreSQL, Zeitzonenübergänge, Wiederholungen oder einen externen CalDAV-Client. Aussagen zur NC33-/NC34-Kompatibilität sind weiterhin offen.
+**Erweiterte Nachweise (27.11.2026):** [Mehrbenutzer- und Sicherheitstest #10](https://github.com/lfflr/Taskdate/actions/runs/46059313311) auf Nextcloud 35 bestanden: zwei eigene Konten und Kalender, Zugriffssperre zwischen Nutzern, veralteter ETag verhindert Überschreiben, RRULE-Aufgabe bleibt unverändert. [Nextcloud-Versionenmatrix #14](https://github.com/lfflr/Taskdate/actions/runs/46059594089) mit **33, 34 und 35 vollständig grün**; dieselbe CalDAV-Teststrecke wird je Version auf einer eigenen frischen Docker-/SQLite-Instanz ausgeführt.
+
+**Testgrenzen:** Kein echter Nextcloud-Tasks-Browserlauf, kein externer CalDAV-Client, keine geteilten oder schreibgeschützten Kalender, keine MariaDB-/PostgreSQL-Datenbank und keine Zeitzonenübergänge. Der RRULE-Test bestätigt nur das bewusste Überspringen wiederkehrender Aufgaben, nicht ihre automatische Verarbeitung. Die CalDAV-Serverintegration wurde inzwischen zusätzlich auf Nextcloud 33 und 34 erfolgreich geprüft; Browser-/Drittclient-Kompatibilität bleibt offen.
 
 ## 4. Gebündelte ergänzende Praxistests – Freigabegruppe A
 
@@ -79,8 +81,8 @@ Besonders wichtig: Prüfen, ob Nextcloud Tasks bei gewöhnlichen Aufgaben automa
 - [x] GPL-Metadaten zur vorhandenen Lizenzdatei passend.
 - [x] Parser-, Planner-, SabreDAV- und Packaging-Testläufe dokumentiert.
 - [x] Serverseitiges CalDAV-End-to-End auf Nextcloud 35.0.3.2 mit Docker und echtem HTTP-Verkehr bestanden.
-- [ ] Ergänzende UI-/Client-/Zeitzonen-/Rechte-Abnahme aus Gruppe A vollständig durchführen.
-- [ ] Nextcloud 33/34 nur dann als kompatibel deklarieren, wenn passend verifiziert; andernfalls Versionsbereich einschränken.
+- [ ] Ergänzende UI-/Client-/Zeitzonen-/Freigabe-Rechte-Abnahme aus Gruppe A vollständig durchführen; Zweibenutzer-ACL und ETag sind bereits automatisiert geprüft.
+- [x] Nextcloud 33/34/35 für echte direkte CalDAV-HTTP-Roundtrips im Docker-/SQLite-Test erfolgreich verifiziert; [CI-Matrix #14](https://github.com/lfflr/Taskdate/actions/runs/46059594089). Keine generelle UI-/Drittclient-Freigabe daraus ableiten.
 - [ ] Rechte an sämtlichen Quellen/Lizenzinhaberschaft klären.
 - [ ] App-Icon visuell prüfen und Screenshots aufnehmen.
 - [ ] App-ID `taskdate` im App Store registrieren.

@@ -17,7 +17,7 @@ Unterstützt sind unter anderem `TT.MM.JJJJ`, `TT.MM.JJ`, `TT.MM.`, `JJJJ-MM-TT`
 
 ## Funktionsweise
 
-Die Nextcloud-DAV-Integration erfolgt über `OCP\\SabrePluginEvent` und ein SabreDAV-Plugin, das die eingehende Kalender-`PUT`-Anfrage **vor** der eigentlichen Speicherung anpasst. Es benötigt keine internen Klassen der DAV-App und erzeugt keinen zweiten Schreibvorgang. Die normalen CalDAV-Berechtigungen, Validierungen und Speicheroperationen bleiben Nextcloud überlassen.
+Die Nextcloud-DAV-Integration erfolgt deklarativ über `appinfo/info.xml` (`types/dav` und `sabre/plugins`). Nextcloud lädt das SabreDAV-Plugin für den regulären Kalender-DAV-Server; es passt eingehende Kalender-`PUT`-Anfragen **vor** der eigentlichen Speicherung an. Es benötigt keine internen Klassen der DAV-App und erzeugt keinen zweiten Schreibvorgang. Die normalen CalDAV-Berechtigungen, Validierungen und Speicheroperationen bleiben Nextcloud überlassen.
 
 `TaskUpdatePlanner` berechnet die Änderung. `X-TASKDATE-AUTO-DUE` kennzeichnet automatisch verwaltete Fälligkeiten. Bereits manuell gesetzte oder veränderte Fälligkeiten bleiben unverändert, ebenso ausdrücklich gelöschte Fälligkeiten. Eine bei der Titelbereinigung entfernte Uhrzeit wird bei späteren Datumsänderungen nach Möglichkeit beibehalten.
 

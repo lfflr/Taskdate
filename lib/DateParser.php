@@ -84,7 +84,7 @@ class DateParser {
         $hasTime = false;
         if (preg_match('/(?<![\d.])(\d{1,2})[.:](\d{2})(?![\d.])/', $rest, $t)
             || preg_match('/(?<!\d)(\d{1,2})(?:[.:](\d{2}))?\s*Uhr\b/iu', $rest, $t)
-            // 4-stellig (z. B. 1400); nur volle/viertel Stunden, damit Jahre wie 2026 nicht passen
+            // 4-stellig (z. B. 1400); Uhrzeiten mit beliebigen Minuten; Datum wird zuvor aus dem Text entfernt
             || preg_match('/(?<![\d.:])([01]\d|2[0-3])(00|15|30|45)(?![\d.:])/', $rest, $t)) {
             $h = (int)$t[1];
             $min = isset($t[2]) && $t[2] !== '' ? (int)$t[2] : 0;

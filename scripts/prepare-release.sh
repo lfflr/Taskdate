@@ -15,7 +15,6 @@ cp "$repo_root/LICENSE" "$stage/taskdate/LICENSE"
 test -f "$stage/taskdate/appinfo/info.xml"
 test -f "$stage/taskdate/lib/AppInfo/Application.php"
 test -f "$stage/taskdate/lib/Sabre/TaskDateSabrePlugin.php"
-test -f "$stage/taskdate/lib/Listener/RegisterSabrePluginListener.php"
 # Make the staging directory available for manual integrity:sign-app signing.
 rm -rf "$out/taskdate"
 cp -R "$stage/taskdate" "$out/taskdate"

@@ -20,6 +20,11 @@ final class TaskUpdatePlanner {
         DateTimeImmutable $now
     ): ?array {
         $managed = $managedDue !== null;
+        if ($managed && $currentDue === null) {
+            // A client explicitly removed the due date but left our marker.
+            // Never silently recreate a due date after this manual action.
+            return null;
+        }
         if ($currentDue !== null && (!$managed || $currentDue !== $managedDue)) {
             // Respect existing and manually modified dates.
             return null;

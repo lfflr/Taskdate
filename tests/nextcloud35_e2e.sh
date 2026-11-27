@@ -65,6 +65,23 @@ fetch "start" "start-after.ics"
 grep -Fq 'SUMMARY:Meeting 261112 1530' "$temp/start-after.ics"
 if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/start-after.ics"; then exit 1; fi
 echo "PASS: DTSTART is excluded"
+make_ics "allday" "Ganztag 261112" ""
+put "allday" "$temp/allday.ics" "put-allday"
+fetch "allday" "allday-after.ics"
+grep -Fq 'DUE;VALUE=DATE:20261112' "$temp/allday-after.ics"
+grep -Fq 'X-TASKDATE-AUTO-DUE:20261112' "$temp/allday-after.ics"
+echo "PASS: date-only all-day DUE"
+
+# Client manually removes DUE but leaves the old TaskDate marker.
+sed '/^DUE:/d' "$temp/updated-after.ics" > "$temp/removed-due.ics"
+put "auto" "$temp/removed-due.ics" "put-removed-due"
+fetch "auto" "removed-after.ics"
+if grep -Eq '^DUE(;|:)' "$temp/removed-after.ics"; then
+  echo "FAIL: manually deleted due date recreated" >&2
+  exit 1
+fi
+echo "PASS: manually deleted DUE not recreated"
+
 http="$(curl -sS -u "$user:incorrect-password" -X PUT -H 'Content-Type: text/calendar' \
   --data-binary @"$temp/auto.ics" -o "$temp/unauth" -w '%{http_code}' "$calendar/unauth.ics")"
 check "$http" "401,403"

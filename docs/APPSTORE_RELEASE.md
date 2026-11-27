@@ -1,109 +1,112 @@
-# TaskDate: Nextcloud App Store preparation
+# TaskDate – Nextcloud App Store / Release-Kandidat
 
-## Status (2026-11-27)
+**Stand: 27.11.2026**  
+Repository: https://github.com/lfflr/Taskdate  
+Entwicklungsbranch: `release/appstore-readiness-2026-11-26`  
+Pull Request: https://github.com/lfflr/Taskdate/pull/1  
+App-Version im PR: **0.2.3**  
+Status: **NICHT veröffentlicht, nicht nach main übernommen, keine Freigabe für produktive Installation.**
 
-Repository: https://github.com/lfflr/Taskdate
-Development branch: release/appstore-readiness-2026-11-26
+## 1. Architektur (neuer Kandidat)
 
-**NOT RELEASED.** Version 0.2.3 in metadata is a prerelease candidate, not a stable/public claim. No App Store registration, certificate, signed release or live Nextcloud 35 integration test is confirmed.
+Die ursprünglichen `CalendarObjectCreatedEvent`-/`CalendarObjectUpdatedEvent`-Listener und der direkte Zugriff auf `OCA\\DAV\\CalDAV\\CalDavBackend` wurden aus dem aktiven Branch entfernt.
 
-## Continued development (2026-11-27)
+Stattdessen registriert die App einen Listener für das öffentliche `OCP\\SabrePluginEvent`. Dieser fügt `TaskDateSabrePlugin` zum DAV-Server hinzu. Das Plugin verarbeitet ein eingehendes `PUT` unter `calendars/<user>/<calendar>/<object>.ics` vor der normalen Nextcloud-Speicherung und verändert nur VTODOs, für die der konservative Sicherheitsfilter zustimmt. Das eingesetzte `beforeMethod:PUT`-Ereignis sowie der Request-Body-Ersatz werden in SabreDAV unterstützt.
 
-- Extended compact HHMM parsing from quarter-hours to arbitrary valid minutes (`1405`, `1537`, `2359`), with parser and title-cleanup regression tests.
-- Changes are confined to PR #1; no App Store release, tag or signature has been issued.
-- Existing task-write architecture continues to depend on an internal Nextcloud DAV backend and is **not cleared for the App Store**.
-- Expanded HHMM parser regression tests and PHP syntax passed in [CI run 45940606432](https://github.com/lfflr/Taskdate/actions/runs/45940606432), commit `4f12096f4ec9923c85672edbb3db449da6fcf318`.
-- This remains a parser test, **not** a Nextcloud 35 integration test.
+Die Aufgabenlogik ist in `TaskUpdatePlanner` ohne Speicherzugriff gekapselt. Nach der Mutation speichert **Nextcloud selbst** über den regulären DAV-Pfad, einschließlich der normalen Berechtigungs- und Kalenderprüfungen. Es wird **kein zweites Update** aus einem nachgelagerten Listener ausgelöst.
 
-## Safety policy added (2026-11-27)
+Verifizierte Quellcode-Bezüge:
+- https://github.com/nextcloud/server/blob/stable35/lib/public/SabrePluginEvent.php
+- https://github.com/nextcloud/server/blob/stable35/apps/dav/lib/Server.php
+- https://github.com/sabre-io/dav/blob/master/lib/DAV/Server.php
+- https://github.com/sabre-io/http/blob/master/lib/Message.php
 
-The listener now uses `TaskWritePolicy::allowsAutomaticDue()` and conservatively skips:
-- recurring VTODOs (`RRULE` or `RECURRENCE-ID`);
-- VTODOs with `DTSTART` until DTSTART/DUE ordering and timezone behavior are integration-tested;
-- items without `SUMMARY`.
+**Achtung:** Die eigenständigen SabreDAV-Tests beweisen noch nicht, dass Nextcloud Tasks auf jeder unterstützten Nextcloud-Version genau diesen PUT-Pfad verwendet. Keine öffentliche Freigabe ohne Praxistest.
 
-This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 compatibility. Task apps may populate `DTSTART` for ordinary tasks. The release remains blocked until that behavior is measured and a correct policy implemented. `tests/task_write_policy_test.php` documents the current safety contract.
+## 2. Behobene technische Punkte
 
-## Event payload handling (2026-11-27)
+- Automatische Fälligkeit und Titelbereinigung sind idempotent und werden vor der Speicherung berechnet.
+- Manuell vergebene, veränderte oder gelöschte DUE-Werte werden nicht überschrieben.
+- Datum `261112` sowie Zeiten `1530`, `1405`, `1537` usw. werden unterstützt.
+- Aufgaben mit `DTSTART`, `RRULE` oder `RECURRENCE-ID` werden vorerst ausgelassen.
+- Unpassende DAV-Pfade, VEVENT und unlesbare iCalendar-Daten werden nicht verändert.
+- SabreHTTP kann Body-Streams bei `getBodyAsString()` verbrauchen: die Originaldaten werden bei unveränderten Anfragen nun wiederhergestellt.
+- Bei bekannten großen `Content-Length`-Werten wird das Lesen übersprungen; nach einer Änderung wird die Länge aktualisiert.
+- Die App-Metadaten verwenden `gpl`, passend zur vorhandenen GPL-3.0-Lizenzdatei (keine Änderung am Lizenztext).
+- Der Release-Staging-Test packt nur Laufzeitdateien, App-Icon und LICENSE.
 
-- Consume the current event's `getObjectData()['calendardata']` only if it is supplied; the event metadata does **not** guarantee this field. The backend fallback remains necessary.
-- If missing, fall back to `getCalendarObject`, still an **internal** DAV dependency.
-- Reject absent/empty/non-string URIs and raw iCalendar payloads without trying to parse them.
-- Ignore objects whose event `component` explicitly identifies `VEVENT`/`VJOURNAL` rather than `VTODO`. With missing metadata, continue to inspect the parsed iCalendar component.
-- `tests/calendar_payload_test.php` checks payload validation; [CI run 45980616375](https://github.com/lfflr/Taskdate/actions/runs/45980616375) passed PHP syntax, parser, write-policy and payload tests. This is **not** a live Nextcloud event-dispatch integration test.
-- The listener still writes with `OCA\\DAV\\CalDAV\\CalDavBackend::updateCalendarObject`. Public API and App Store compatibility remain blocked and must be investigated independently.
+## 3. Automatisierte Prüfungen
 
-## Packaging checks (2026-11-27)
+Die GitHub-Actions-Konfiguration `.github/workflows/php-checks.yml` prüft:
+- PHP-Syntax
+- Datum/Uhrzeit-Parser
+- Reinen Task-Update-Planer
+- Konservative Schreibschutzregeln
+- SabreDAV-HTTP-PUT-Tests mit echten SabreDAV-/VObject-Bibliotheken, auch Stream-Body und idempotente Updates
+- Installationsverzeichnis / App-Metadaten
+- Statische App-Store-Sperre auf interne DAV-API und widersprüchliche Lizenzangaben
 
-A new `tests/release_staging_test.sh` validates unsigned staging structure and basic appinfo metadata, and is now invoked from the PHP CI workflow. [Run 45994185733](https://github.com/lfflr/Taskdate/actions/runs/45994185733) passed all five checks: syntax, parser, safety policy, event payload, and staging smoke test. The script does **not** sign the release or validate it against the official Nextcloud appinfo schema. Do not interpret a green staging test as App Store approval.
+Nachweise:
+- [Run #61](https://github.com/lfflr/Taskdate/actions/runs/46029191536): öffentliche Sabre-Architektur und statische Release-Prüfung erfolgreich.
+- [Run #63](https://github.com/lfflr/Taskdate/actions/runs/46029284782): Testfall für Stream-Body erfolgreich.
+- [Run #65](https://github.com/lfflr/Taskdate/actions/runs/46029347331): manuell gelöschte Fälligkeiten werden nicht wieder eingesetzt.
 
-## Review note (2026-11-27)
+Tests ersetzen ausdrücklich **nicht** die echte Nextcloud-35-Prüfung.
 
-The previous description claiming that Nextcloud 35 events generally include `calendardata` was too strong. The listener now documents that event payloads may contain only metadata and therefore continues to use backend lookup for the raw object. The public OCP calendar event is useful for detecting changes, not proof of a public existing-object write API. No claim of App Store acceptance is made.
+## 4. Gebündelter Praxistest – Freigabegruppe A
 
-[CI run 46022264052](https://github.com/lfflr/Taskdate/actions/runs/46022264052) succeeded for PHP syntax, parser, task-write safety, event payload filtering, and staging verification at commit `56e0f42fb32e9b371afd2530c906d0f402bb25af`. This does not establish Nextcloud 35 integration or public API compatibility.
+Nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:
 
-## Static App Store gate (2026-11-27)
+1. App aus dem PR-Branch nach `custom_apps/taskdate` installieren und aktivieren.
+2. In Nextcloud Tasks `Zahnarzt 261112 1530` anlegen. Prüfen: DUE 12.11.2026 15:30, Titel `Zahnarzt 261112`, Anzeige im Kalender bei aktivierten Aufgaben.
+3. `Zahnarzt 261112 1405` und `Besprechung 20261112 1537` anlegen: DUE, Titelbereinigung und Zeitzone prüfen.
+4. Eine TaskDate-verwaltete Aufgabe auf anderes Datum ändern: Uhrzeit erhalten; nach Neuladen keine weiteren Schreibereignisse.
+5. Neue Aufgabe mit manuell gesetzter Fälligkeit: nicht überschreiben; DUE nachträglich manuell verändern/löschen und Titel ändern: Entscheidung erhalten.
+6. Aufgaben mit `DTSTART`, `RRULE` und `RECURRENCE-ID`: keine automatische Mutation.
+7. VEVENT und andere DAV-Dateien, Kalender ohne Schreibrechte sowie geteilte Kalender: unverändert bzw. korrekt vom Server abgewiesen.
+8. Mit einem externen CalDAV-Client eine Aufgabe anlegen und ändern; Ergebnis auf Client und Server vergleichen.
+9. Zeitzone Europa/Berlin einschließlich Zeitumstellungen und Aufgaben ohne Uhrzeit prüfen.
+10. Browser, Server-Logs und Datenintegrität beobachten; dokumentieren, welche App/Client-Version tatsächlich geprüft wurde.
 
-Run `bash scripts/check-release-blockers.sh` from any working directory. The script is expected to exit nonzero on this branch and report the two outstanding blockers: use of the internal `OCA\\DAV\\CalDAV\\CalDavBackend` implementation, and `appinfo/info.xml` claiming AGPL when the included `LICENSE` is GPL-3.0. CI explicitly verifies that **both** blockers are detected instead of treating a successful staging smoke test as release readiness.
+Besonders wichtig: Prüfen, ob Nextcloud Tasks bei gewöhnlichen Aufgaben automatisch `DTSTART` setzt. In diesem Fall würde der derzeitige Schutzfilter diese Aufgaben ausschließen. Dann im eigenen Entwicklungsschritt mit passenden Tests erweitern.
 
-[GitHub Actions run 46025534949](https://github.com/lfflr/Taskdate/actions/runs/46025534949) passed PHP syntax, parser, safety policy, event payload, staging and the expected-blocker detection check (commit `3046096642dd417d89ccd0b151e8c411c2e2fca3`). The release gate itself **correctly rejects** the current candidate.
+## 5. Freigabegruppe B – Veröffentlichung
 
-The script is a **pre-release static guard only**. Passing it in a future branch will not replace a live Nextcloud 35 integration test, public API architecture review, signing or App Store submission.
+- [x] Kein direkter Zugriff der aktiven App auf `OCA\\DAV\\CalDAV\\CalDavBackend`.
+- [x] GPL-Metadaten zur vorhandenen Lizenzdatei passend.
+- [x] Parser-, Planner-, SabreDAV- und Packaging-Testläufe dokumentiert.
+- [ ] End-to-End auf Nextcloud 35 erfolgreich, einschließlich aller Fälle aus Gruppe A.
+- [ ] Nextcloud 33/34 nur dann als kompatibel deklarieren, wenn passend verifiziert; andernfalls Versionsbereich einschränken.
+- [ ] Rechte an sämtlichen Quellen/Lizenzinhaberschaft klären.
+- [ ] App-Icon visuell prüfen und Screenshots aufnehmen.
+- [ ] App-ID `taskdate` im App Store registrieren.
+- [ ] Signaturzertifikat beantragen und erhalten.
+- [ ] Saubere signierte `taskdate.tar.gz` erzeugen.
+- [ ] Version/Release-Link im Nextcloud App Store eintragen.
 
-## Before approval
+## 6. Signieren – erst nach A/B-Freigabe
 
-- [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).
-- [x] Expanded parser regression workflow passed on commit 8361851f266b708b4bebdc5e4a681ee95ce0077a (GitHub Actions run 45819377473).
-- [ ] Test task creation and edits against a disposable Nextcloud 35 test installation, including CalDAV update events, title cleanup, timezone, START/DUE handling and recurring tasks.
-- [ ] Exercise `Zahnarzt 261112 1530`, confirm DUE 2026-11-12 15:30 and SUMMARY `Zahnarzt 261112`.
-- [ ] Verify existing manual DUE remains unchanged, including after changing SUMMARY.
-- [ ] Check that creating an event on a read-only/shared calendar is ignored without damage.
-- [ ] Verify how Nextcloud Tasks populates DTSTART; revise conservative skip to support normal tasks without allowing DUE earlier than DTSTART.
-- [ ] Check Europe/Berlin summer/winter timezone changes and recurrence behavior.
-- [ ] The documented public calendar API is read-only for existing objects; design and validate a supported task update path before release. Do not assume ICreateFromString is an update API. Replace internal Nextcloud class dependency `OCA\DAV\CalDAV\CalDavBackend` with a compliant supported public interface or secure supported integration. App Store policy requires public APIs.
-- [ ] Confirm the licensing and rights for all code; the repository LICENSE is GPL-3.0 while current appinfo describes AGPL. Do not silently relicense.
-- [ ] Add an app icon (`img/app.svg`) and screenshots, then verify correct rendering.
-- [ ] Review description, contact / issue URL, and author identification.
-- [ ] Register the `taskdate` App ID with the Nextcloud App Store.
-- [ ] Create signing key **locally**, never commit the private key.
-- [ ] Submit CSR via https://github.com/nextcloud/app-certificate-requests and receive the certificate.
-- [ ] Sign the exact staged distribution with `occ integrity:sign-app`.
-- [ ] Package signed app directory as `taskdate.tar.gz` and upload to a GitHub release.
-- [ ] Submit release URL via Nextcloud App Store dashboard.
-
-## API risk (release blocker)
-
-The listener currently injects `OCA\\DAV\\CalDAV\\CalDavBackend` and calls
-`getCalendarObject` and `updateCalendarObject`. The OCP event can contain raw iCalendar content; the listener now uses it
-when available and falls back to internal DAV read methods otherwise. This
-is **not proof that the App Store will accept the dependency or that all
-calendars are safe to write**. Do not merge/release until a supported write architecture
-and a Nextcloud 35 integration test are established.
-
-## Private key and CSR (on your trusted computer)
+Privaten Schlüssel ausschließlich auf einem vertrauenswürdigen eigenen Rechner erzeugen, **niemals ins Repository hochladen**:
 
 ```bash
 openssl req -nodes -newkey rsa:4096 -keyout taskdate.key -out taskdate.csr -subj "/CN=taskdate"
 ```
 
-Keep taskdate.key offline/private. Only submit taskdate.csr.
-
-## Prepare runtime-only staging
-
-Run `bash scripts/prepare-release.sh` to create `dist/taskdate` containing runtime files **and the repository LICENSE file**. Do not upload or publish this directory before signing. The script deliberately excludes `.github/`, `tests/`, and private keys.
-
-## Signing (after certificate approval)
+CSR über https://github.com/nextcloud/app-certificate-requests beantragen.
 
 ```bash
-php occ integrity:sign-app --privateKey=/secure/taskdate.key --certificate=/secure/taskdate.crt --path=/absolute/path/to/taskdate
+bash scripts/prepare-release.sh
+# Mit dem auf dem eigenen Nextcloud-Server verfügbaren OCC signieren:
+php occ integrity:sign-app --privateKey=/secure/taskdate.key --certificate=/secure/taskdate.crt --path=/absolute/path/to/dist/taskdate
 cd /absolute/path/to/dist
 tar -czf taskdate.tar.gz taskdate
 ```
 
-Use a clean staging directory containing runtime files and LICENSE; no tests, GitHub workflows or private keys. Run the signing command **before** archiving, and do not edit any signed files.
+Die Dateien in `dist/taskdate` nach der Signierung nicht mehr verändern. Der Upload in den App Store darf erst auf Grundlage des signierten GitHub-Releases erfolgen.
 
-Official Nextcloud documentation:
+Offizielle Nextcloud-Dokumentation:
 - https://docs.nextcloud.com/server/stable/developer_manual/app_publishing_maintenance/release_process.html
 - https://docs.nextcloud.com/server/stable/developer_manual/app_publishing_maintenance/code_signing.html
 - https://docs.nextcloud.com/server/stable/developer_manual/app_publishing_maintenance/publishing.html
+
+Zentrale Übergabe und weitere Meilensteine: [HANDOVER.md](HANDOVER.md) und [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md).

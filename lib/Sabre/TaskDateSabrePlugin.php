@@ -31,14 +31,25 @@ final class TaskDateSabrePlugin extends ServerPlugin {
     }
 
     public function handlePut($request, $response): void {
-        // This plugin must never change arbitrary WebDAV uploads.
+        // Never change other WebDAV resources.
         $path = $request->getPath();
         if (!is_string($path)
             || preg_match('~(?:^|/)calendars/[^/]+/[^/]+/[^/]+\.ics$~i', $path) !== 1) {
             return;
         }
 
+        // Do not buffer known oversized requests.
+        $length = $request->getHeader('Content-Length');
+        if (is_string($length) && ctype_digit($length)
+            && (float)$length > self::MAX_ICAL_BYTES) {
+            return;
+        }
+
+        $raw = null;
+        $rewritten = false;
         try {
+            // SabreHTTP may consume a request-body stream here. Always put it
+            // back on a skipped / invalid request, not just on successful PUTs.
             $raw = $request->getBodyAsString();
             if (!is_string($raw) || $raw === ''
                 || strlen($raw) > self::MAX_ICAL_BYTES) {
@@ -86,10 +97,14 @@ final class TaskDateSabrePlugin extends ServerPlugin {
             $serialized = $vobj->serialize();
             $request->setBody($serialized);
             $request->setHeader('Content-Length', (string)strlen($serialized));
+            $rewritten = true;
         } catch (\Throwable $e) {
-            // Fail closed: leave the original request for the DAV validator.
-            // The plugin must not prevent a user's unmodified task from saving.
-            return;
+            // Leave original data to Nextcloud's standard CalDAV validator.
+        } finally {
+            if (!$rewritten && is_string($raw)) {
+                $request->setBody($raw);
+            }
         }
     }
+
 }

@@ -12,10 +12,10 @@ check() {
 }
 cat > "$temp/calendar.xml" <<'XML'
 <?xml version="1.0" encoding="UTF-8"?>
-<d:mkcalendar xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
+<c:mkcalendar xmlns:d="DAV:" xmlns:c="urn:ietf:params:xml:ns:caldav">
 <d:set><d:prop><d:displayname>TaskDate E2E</d:displayname>
 <c:supported-calendar-component-set><c:comp name="VTODO"/></c:supported-calendar-component-set>
-</d:prop></d:set></d:mkcalendar>
+</d:prop></d:set></c:mkcalendar>
 XML
 http="$(curl -fsS -u "$user:$pass" -X MKCALENDAR -H 'Content-Type: application/xml' \
   --data-binary @"$temp/calendar.xml" -o "$temp/mkresponse" -w '%{http_code}' "$calendar/" || true)"

@@ -11,7 +11,7 @@ Status: **NICHT veröffentlicht, nicht nach main übernommen, keine Freigabe fü
 
 Die ursprünglichen `CalendarObjectCreatedEvent`-/`CalendarObjectUpdatedEvent`-Listener und der direkte Zugriff auf `OCA\\DAV\\CalDAV\\CalDavBackend` wurden aus dem aktiven Branch entfernt.
 
-Stattdessen registriert die App einen Listener für das öffentliche `OCP\\SabrePluginEvent`. Dieser fügt `TaskDateSabrePlugin` zum DAV-Server hinzu. Das Plugin verarbeitet ein eingehendes `PUT` unter `calendars/<user>/<calendar>/<object>.ics` vor der normalen Nextcloud-Speicherung und verändert nur VTODOs, für die der konservative Sicherheitsfilter zustimmt. Das eingesetzte `beforeMethod:PUT`-Ereignis sowie der Request-Body-Ersatz werden in SabreDAV unterstützt.
+Stattdessen wird `TaskDateSabrePlugin` über die deklarative DAV-Plugin-Konfiguration in `appinfo/info.xml` (`types/dav`, `sabre/plugins`) geladen. Der Nextcloud-35-`PluginManager` verwendet diesen Pfad ausdrücklich für den normalen DAV-Server. Der zuvor versuchte `OCP\\SabrePluginEvent`-Listener wurde wieder entfernt, da `apps/dav/lib/Server.php` im normalen CalDAV-Pfad stattdessen ein DAV-internes Ereignis auslöst. Das Plugin verarbeitet ein eingehendes `PUT` unter `calendars/<user>/<calendar>/<object>.ics` vor der normalen Nextcloud-Speicherung und verändert nur VTODOs, für die der konservative Sicherheitsfilter zustimmt. Das eingesetzte `beforeMethod:PUT`-Ereignis sowie der Request-Body-Ersatz werden in SabreDAV unterstützt.
 
 Die Aufgabenlogik ist in `TaskUpdatePlanner` ohne Speicherzugriff gekapselt. Nach der Mutation speichert **Nextcloud selbst** über den regulären DAV-Pfad, einschließlich der normalen Berechtigungs- und Kalenderprüfungen. Es wird **kein zweites Update** aus einem nachgelagerten Listener ausgelöst.
 

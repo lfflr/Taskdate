@@ -12,7 +12,7 @@ Die Dateien aus diesem Repository in `custom_apps/taskdate` der Nextcloud-Instal
 
 - Daten: `12.11.2026`, `12.11.26`, `12.11.`, `2026-11-12`, `20261112`, `261112` (JJMMTT)
 - Relative Angaben: `heute`, `morgen`, `übermorgen`, deutsche Wochentage
-- Uhrzeiten: `14:30`, `14.30`, `14 Uhr`, `14.30 Uhr`, vierstellige Schreibweisen wie `1400` (Minuten 00, 15, 30 oder 45)
+- Uhrzeiten: `14:30`, `14.30`, `14 Uhr`, `14.30 Uhr`, vierstellige Schreibweisen wie `1400`, `1405` oder `1537` (beliebige gültige Minuten)
 
 Ohne erkannte Uhrzeit wird ein ganztägiges `DUE`-Datum gesetzt. Nach der automatischen Übernahme wird die erkannte Uhrzeit aus dem Titel entfernt (`Zahnarzt 261112 1530` → `Zahnarzt 261112`), die Fälligkeit bleibt bei 15:30 Uhr. Bei späteren Titeländerungen ohne neue Uhrzeit bleibt die automatisch erkannte Uhrzeit erhalten. Bereits vorhandene manuelle Fälligkeiten bleiben unverändert. Automatisch erzeugte Fälligkeiten werden über `X-TASKDATE-AUTO-DUE` gekennzeichnet und bei Titeländerungen aktualisiert oder bei Entfernen des Datums gelöscht. Wird eine automatisch gesetzte Fälligkeit manuell geändert, fasst TaskDate sie nicht mehr an. Es wird **kein zusätzlicher Kalendereintrag** erstellt: Die bestehende Aufgabe erscheint bei aktivierter Aufgabenanzeige im Kalender.
 
@@ -35,7 +35,7 @@ Eine minimale Praxisprüfung auf Nextcloud 35:
 
 ## Prüfung und bekannte Einschränkungen
 
-Die PHP-Laufzeit steht in der Entwicklungsumgebung derzeit nicht zur Verfügung; PHP-Syntaxprüfung und obige Testfälle sind daher noch auszuführen. Ein Test gegen eine echte Nextcloud-/CalDAV-Instanz steht ebenfalls aus. Insbesondere Zeitzonen, Wiederholungsaufgaben und die Verarbeitung externer Aufgabenclients bleiben zu prüfen.
+Die PHP-Syntaxprüfung und Parser-Regressionen werden über GitHub Actions ausgeführt (siehe den jeweils aktuellen PR-Prüflauf). Ein Test gegen eine echte Nextcloud-/CalDAV-Instanz steht ebenfalls aus. Insbesondere Zeitzonen, Wiederholungsaufgaben und die Verarbeitung externer Aufgabenclients bleiben zu prüfen.
 
 Die ursprüngliche Metadaten-Lizenz lautet `agpl`, während das Repository eine GPL-3.0-Lizenzdatei enthält. Diese Inkonsistenz sollte mit dem Rechteinhaber geklärt werden.
 

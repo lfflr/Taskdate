@@ -1,0 +1,55 @@
+name: Nextcloud 35 integration (isolated)
+on:
+  pull_request:
+    paths:
+      - 'tests/nextcloud35_e2e.sh'
+      - '.github/workflows/nextcloud35-e2e.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  caldav-nextcloud35:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare unsigned runtime package
+        run: bash scripts/prepare-release.sh "$RUNNER_TEMP/stage"
+      - name: Start disposable Nextcloud 35 container
+        run: |
+          docker run --detach --name taskdate-nc35 --publish 127.0.0.1:18085:80 \
+            -e NEXTCLOUD_ADMIN_USER=admin \
+            -e NEXTCLOUD_ADMIN_PASSWORD=taskdate-e2e-test \
+            -e SQLITE_DATABASE=nextcloud \
+            -e NEXTCLOUD_TRUSTED_DOMAINS=127.0.0.1:18085 \
+            nextcloud:35-apache
+      - name: Wait for automatic Nextcloud installation
+        run: |
+          ready=0
+          for i in $(seq 1 90); do
+            if docker exec -u www-data taskdate-nc35 php occ status --output=json 2>/dev/null | grep -q '"installed":true'; then
+              ready=1
+              break
+            fi
+            sleep 5
+          done
+          if test "$ready" != 1; then
+            docker logs --tail 100 taskdate-nc35
+            exit 1
+          fi
+      - name: Install TaskDate from staged runtime files
+        run: |
+          docker cp "$RUNNER_TEMP/stage/taskdate" taskdate-nc35:/var/www/html/custom_apps/taskdate
+          docker exec taskdate-nc35 chown -R www-data:www-data /var/www/html/custom_apps/taskdate
+          docker exec -u www-data taskdate-nc35 php occ app:enable taskdate
+          docker exec -u www-data taskdate-nc35 php occ app:list | grep -F 'taskdate: 0.2.3'
+      - name: Exercise authenticated CalDAV PUT and GET round trips
+        run: bash tests/nextcloud35_e2e.sh
+      - name: Show diagnostic logs on failure
+        if: failure()
+        run: |
+          docker logs --tail 100 taskdate-nc35 || true
+          docker exec taskdate-nc35 sh -c 'tail -n 150 /var/www/html/data/nextcloud.log' || true
+      - name: Remove disposable container
+        if: always()
+        run: docker rm -f taskdate-nc35 || true

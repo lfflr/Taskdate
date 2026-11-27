@@ -7,6 +7,7 @@ use OCA\DAV\CalDAV\CalDavBackend;
 use OCP\Calendar\Events\CalendarObjectCreatedEvent;
 use OCP\Calendar\Events\CalendarObjectUpdatedEvent;
 use OCA\TaskDate\DateParser;
+use OCA\TaskDate\TaskWritePolicy;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use Psr\Log\LoggerInterface;
@@ -42,13 +43,7 @@ class TaskDateListener implements IEventListener {
             }
             $vobj = Reader::read($stored['calendardata']);
             $todo = $vobj->VTODO ?? null;
-            if ($todo === null || !isset($todo->SUMMARY)) {
-                return;
-            }
-
-            // Do not silently rewrite recurring tasks or tasks whose DTSTART
-            // constrains DUE. These require separate timezone/recurrence handling.
-            if (isset($todo->RRULE) || isset($todo->{'RECURRENCE-ID'}) || isset($todo->DTSTART)) {
+            if ($todo === null || !TaskWritePolicy::allowsAutomaticDue($todo)) {
                 return;
             }
 

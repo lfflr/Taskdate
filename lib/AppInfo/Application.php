@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace OCA\TaskDate\AppInfo;
 
-use OCP\Calendar\Events\CalendarObjectCreatedEvent;
-use OCP\Calendar\Events\CalendarObjectUpdatedEvent;
-use OCA\TaskDate\Listener\TaskDateListener;
+use OCA\TaskDate\Listener\RegisterSabrePluginListener;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\SabrePluginEvent;
 
 class Application extends App implements IBootstrap {
     public const APP_ID = 'taskdate';
@@ -19,8 +18,7 @@ class Application extends App implements IBootstrap {
     }
 
     public function register(IRegistrationContext $context): void {
-        $context->registerEventListener(CalendarObjectCreatedEvent::class, TaskDateListener::class);
-        $context->registerEventListener(CalendarObjectUpdatedEvent::class, TaskDateListener::class);
+        $context->registerEventListener(SabrePluginEvent::class, RegisterSabrePluginListener::class);
     }
 
     public function boot(IBootContext $context): void {

@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace OCA\TaskDate\AppInfo;
 
-use OCA\TaskDate\Listener\RegisterSabrePluginListener;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\SabrePluginEvent;
 
+/**
+ * DAV plugin registration lives in appinfo/info.xml (sabre/plugins).
+ * Nextcloud loads it for the normal authenticated CalDAV server.
+ */
 class Application extends App implements IBootstrap {
     public const APP_ID = 'taskdate';
 
@@ -18,7 +20,6 @@ class Application extends App implements IBootstrap {
     }
 
     public function register(IRegistrationContext $context): void {
-        $context->registerEventListener(SabrePluginEvent::class, RegisterSabrePluginListener::class);
     }
 
     public function boot(IBootContext $context): void {

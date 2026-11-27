@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare unsigned runtime package
         run: bash scripts/prepare-release.sh "$RUNNER_TEMP/stage"
-      - name: Start disposable Nextcloud 35 container
+      - name: Start disposable Nextcloud container
         run: |
           docker run --detach --name taskdate-nc35 --publish 127.0.0.1:18085:80 \
             -e NEXTCLOUD_ADMIN_USER=admin \
@@ -44,7 +44,7 @@ jobs:
       - name: Verify Nextcloud major version
         run: |
           docker exec -u www-data taskdate-nc35 php occ status --output=json | tee "$RUNNER_TEMP/nextcloud-status.json"
-          grep -Eq '"versionstring""[[:space:]]*:[[:space:]]*"${{ matrix.nextcloud }}\\.' "$RUNNER_TEMP/nextcloud-status.json"
+          grep -Eq '"versionstring"[[:space:]]*:[[:space:]]*"${{ matrix.nextcloud }}\\.' "$RUNNER_TEMP/nextcloud-status.json"
       - name: Install TaskDate from staged runtime files
         run: |
           docker cp "$RUNNER_TEMP/stage/taskdate" taskdate-nc35:/var/www/html/custom_apps/taskdate

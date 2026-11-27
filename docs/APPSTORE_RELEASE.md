@@ -29,6 +29,7 @@ Verifizierte Quellcode-Bezüge:
 - Manuell vergebene, veränderte oder gelöschte DUE-Werte werden nicht überschrieben.
 - Datum `261112` sowie Zeiten `1530`, `1405`, `1537` usw. werden unterstützt.
 - Aufgaben mit `DTSTART`, `RRULE` oder `RECURRENCE-ID` werden vorerst ausgelassen.
+- Explizite DUE-Zeitzonen (`TZID`, UTC `Z`), VTIMEZONE sowie gemischte oder mehrfach enthaltene Komponenten werden bis zur gesonderten Client-/Zeitzonenabnahme unverändert weitergereicht. Fünf SabreDAV-Regressionstests dokumentieren diese Schutzgrenze.
 - Unpassende DAV-Pfade, VEVENT und unlesbare iCalendar-Daten werden nicht verändert.
 - SabreHTTP kann Body-Streams bei `getBodyAsString()` verbrauchen: die Originaldaten werden bei unveränderten Anfragen nun wiederhergestellt.
 - Bei bekannten großen `Content-Length`-Werten wird das Lesen übersprungen; nach einer Änderung wird die Länge aktualisiert.
@@ -60,7 +61,7 @@ Nachweise:
 
 ## 4. Gebündelte ergänzende Praxistests – Freigabegruppe A
 
-Die serverseitigen Standardfälle sind mit der isolierten Docker-Instanz bereits getestet. Für die verbleibende **UI-/Client-Abnahme** nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:
+Die serverseitigen Standardfälle sind mit der isolierten Docker-Instanz bereits getestet. Für die verbleibende **UI-/Client-Abnahme** gemäß [UI_CLIENT_ACCEPTANCE.md](UI_CLIENT_ACCEPTANCE.md) nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:
 
 1. App aus dem PR-Branch nach `custom_apps/taskdate` installieren und aktivieren.
 2. In Nextcloud Tasks `Zahnarzt 261112 1530` anlegen. Prüfen: DUE 12.11.2026 15:30, Titel `Zahnarzt 261112`, Anzeige im Kalender bei aktivierten Aufgaben.
@@ -74,6 +75,8 @@ Die serverseitigen Standardfälle sind mit der isolierten Docker-Instanz bereits
 10. Browser, Server-Logs und Datenintegrität beobachten; dokumentieren, welche App/Client-Version tatsächlich geprüft wurde.
 
 Besonders wichtig: Prüfen, ob Nextcloud Tasks bei gewöhnlichen Aufgaben automatisch `DTSTART` setzt. In diesem Fall würde der derzeitige Schutzfilter diese Aufgaben ausschließen. Dann im eigenen Entwicklungsschritt mit passenden Tests erweitern.
+
+Eine gebündelte Prüftabelle mit Testfällen A1–A8, B1–B5 und C1–C4 sowie einem Fehlerprotokoll liegt unter [UI_CLIENT_ACCEPTANCE.md](UI_CLIENT_ACCEPTANCE.md). Die dort beschriebenen Praxisfälle sind **nicht** bereits als ausgeführt zu werten.
 
 ## 5. Freigabegruppe B – Veröffentlichung
 

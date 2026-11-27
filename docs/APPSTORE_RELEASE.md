@@ -1,11 +1,18 @@
 # TaskDate: Nextcloud App Store preparation
 
-## Status (2026-11-26)
+## Status (2026-11-27)
 
 Repository: https://github.com/lfflr/Taskdate
 Development branch: release/appstore-readiness-2026-11-26
 
 **NOT RELEASED.** Version 0.2.3 in metadata is a prerelease candidate, not a stable/public claim. No App Store registration, certificate, signed release or live Nextcloud 35 integration test is confirmed.
+
+## Continued development (2026-11-27)
+
+- Extended compact HHMM parsing from quarter-hours to arbitrary valid minutes (`1405`, `1537`, `2359`), with parser and title-cleanup regression tests.
+- Changes are confined to PR #1; no App Store release, tag or signature has been issued.
+- Existing task-write architecture continues to depend on an internal Nextcloud DAV backend and is **not cleared for the App Store**.
+- PHP CI for the expanded minute handling must be confirmed before merging.
 
 ## Before approval
 

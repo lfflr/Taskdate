@@ -41,6 +41,8 @@ A new `tests/release_staging_test.sh` validates unsigned staging structure and b
 
 The previous description claiming that Nextcloud 35 events generally include `calendardata` was too strong. The listener now documents that event payloads may contain only metadata and therefore continues to use backend lookup for the raw object. The public OCP calendar event is useful for detecting changes, not proof of a public existing-object write API. No claim of App Store acceptance is made.
 
+[CI run 46022264052](https://github.com/lfflr/Taskdate/actions/runs/46022264052) succeeded for PHP syntax, parser, task-write safety, event payload filtering, and staging verification at commit `56e0f42fb32e9b371afd2530c906d0f402bb25af`. This does not establish Nextcloud 35 integration or public API compatibility.
+
 ## Before approval
 
 - [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).

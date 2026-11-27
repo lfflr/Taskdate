@@ -2,6 +2,9 @@ name: Nextcloud 33-35 integration (isolated)
 on:
   pull_request:
     paths:
+      - 'appinfo/**'
+      - 'lib/**'
+      - 'scripts/prepare-release.sh'
       - 'tests/nextcloud35_e2e.sh'
       - '.github/workflows/nextcloud35-e2e.yml'
   workflow_dispatch:

@@ -29,7 +29,7 @@ This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 comp
 - Prefer the current event's `getObjectData()['calendardata']`, which the Nextcloud DAV backend normally provides.
 - If missing, fall back to `getCalendarObject`, still an **internal** DAV dependency.
 - Reject absent/empty/non-string URIs and raw iCalendar payloads without trying to parse them.
-- `tests/calendar_payload_test.php` checks the payload validation but is **not** a live Nextcloud event-dispatch integration test.
+- `tests/calendar_payload_test.php` checks payload validation; [CI run 45980616375](https://github.com/lfflr/Taskdate/actions/runs/45980616375) passed PHP syntax, parser, write-policy and payload tests. This is **not** a live Nextcloud event-dispatch integration test.
 - The listener still writes with `OCA\\DAV\\CalDAV\\CalDavBackend::updateCalendarObject`. Public API and App Store compatibility remain blocked and must be investigated independently.
 
 ## Before approval

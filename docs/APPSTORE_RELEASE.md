@@ -47,6 +47,8 @@ The previous description claiming that Nextcloud 35 events generally include `ca
 
 Run `bash scripts/check-release-blockers.sh` from any working directory. The script is expected to exit nonzero on this branch and report the two outstanding blockers: use of the internal `OCA\\DAV\\CalDAV\\CalDavBackend` implementation, and `appinfo/info.xml` claiming AGPL when the included `LICENSE` is GPL-3.0. CI explicitly verifies that **both** blockers are detected instead of treating a successful staging smoke test as release readiness.
 
+[GitHub Actions run 46025534949](https://github.com/lfflr/Taskdate/actions/runs/46025534949) passed PHP syntax, parser, safety policy, event payload, staging and the expected-blocker detection check (commit `3046096642dd417d89ccd0b151e8c411c2e2fca3`). The release gate itself **correctly rejects** the current candidate.
+
 The script is a **pre-release static guard only**. Passing it in a future branch will not replace a live Nextcloud 35 integration test, public API architecture review, signing or App Store submission.
 
 ## Before approval

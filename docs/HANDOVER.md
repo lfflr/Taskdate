@@ -12,7 +12,7 @@
 ## Übernommene Arbeit
 
 1. Bisheriges post-save `CalendarObjectCreatedEvent`/`CalendarObjectUpdatedEvent`-Handling einschließlich direktem `OCA\\DAV\\CalDAV\\CalDavBackend`-Zugriff aus dem Branch entfernt.
-2. Öffentliche DAV-Anbindung: `OCP\\SabrePluginEvent` registriert `TaskDateSabrePlugin`; das Plugin verarbeitet passende `PUT`-Anfragen vor dem regulären Nextcloud-DAV-Speichern.
+2. DAV-Anbindung über `appinfo/info.xml` (`types/dav`, `sabre/plugins`), geladen durch den Nextcloud-35-DAV-PluginManager; `TaskDateSabrePlugin` verarbeitet passende `PUT`-Anfragen vor dem regulären Speichern. Der zunächst erprobte `OCP\\SabrePluginEvent`-Listener wurde entfernt, da er auf dem normalen DAV-Pfad nicht aufgerufen wird.
 3. `TaskUpdatePlanner` kapselt Aufgabenumwandlung; manuelle DUE, geänderte oder gelöschte Fälligkeit, idempotente Updates, Titelbereinigung und automatische Marker berücksichtigt.
 4. `TaskWritePolicy` schützt vor Änderungen an DTSTART- und Wiederholungsaufgaben. Dies ist bewusst eingeschränkt.
 5. CalDAV-HTTP-Request-Tests mit echten SabreDAV- und VObject-Klassen einschließlich Stream-Body-Reparatur hinzugefügt.

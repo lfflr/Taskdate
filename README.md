@@ -1,47 +1,48 @@
-# Taskdate
+# TaskDate for Nextcloud
 
-Nextcloud-App zur automatischen Erkennung von Datumsangaben im Titel einer Aufgabe (`VTODO`). Beispiel: `Zahnarzt 20261112 1400` wird am 12.11.2026 um 14:00 Uhr fällig.
+TaskDate erkennt Datums- und Uhrzeitangaben in Nextcloud-Aufgabentiteln (VTODO) und setzt automatisch das Fälligkeitsdatum. Bei einer erkannten Uhrzeit wird diese aus dem Titel entfernt. Es entsteht **kein zusätzlicher Kalendereintrag**: Die bestehende Aufgabe kann mit aktivierter Aufgabenanzeige im Kalender erscheinen.
 
-## Installation
+**Status:** 0.2.3 ist ein Entwicklungskandidat in [PR #1](https://github.com/lfflr/Taskdate/pull/1). Kein freigegebenes App-Store-Release. Nextcloud 33–35 ist deklariert; ein realer Nextcloud-35-Integrationstest steht noch aus.
 
-Die Dateien aus diesem Repository in `custom_apps/taskdate` der Nextcloud-Installation ablegen und anschließend als Administrator aktivieren, beispielsweise mit `php occ app:enable taskdate`.
+## Beispiele
 
-**Entwicklungskandidat 0.2.3 (PR #1, kein freigegebenes Release):** Die App deklariert Nextcloud **33–35**. Die Nextcloud-35-Kompatibilität ist noch **nicht durch einen echten CalDAV-Integrationstest bestätigt**. Vor der produktiven Nutzung auf einer Testinstanz ausprobieren.
+| Eingabe | Automatische Fälligkeit | Gespeicherter Titel |
+|---|---|---|
+| `Zahnarzt 261112 1530` | 12.11.2026, 15:30 | `Zahnarzt 261112` |
+| `Termin 20261112 1405` | 12.11.2026, 14:05 | `Termin 20261112` |
+| `Anruf 12.11.2026 14:30` | 12.11.2026, 14:30 | `Anruf 12.11.2026` |
+| `Zahnarzt 261112` | 12.11.2026, ganztägig | `Zahnarzt 261112` |
 
-## Erkennung
+Unterstützt sind unter anderem `TT.MM.JJJJ`, `TT.MM.JJ`, `TT.MM.`, `JJJJ-MM-TT`, `JJJJMMTT`, `JJMMTT` sowie `heute`, `morgen`, `übermorgen` und Wochentage. Uhrzeiten: `14:30`, `14.30`, `14 Uhr`, `14.30 Uhr`, `1400`, `1537` (gültige Minuten von 00 bis 59).
 
-- Daten: `12.11.2026`, `12.11.26`, `12.11.`, `2026-11-12`, `20261112`, `261112` (JJMMTT)
-- Relative Angaben: `heute`, `morgen`, `übermorgen`, deutsche Wochentage
-- Uhrzeiten: `14:30`, `14.30`, `14 Uhr`, `14.30 Uhr`, vierstellige Schreibweisen wie `1400`, `1405` oder `1537` (beliebige gültige Minuten)
+## Funktionsweise
 
-Ohne erkannte Uhrzeit wird ein ganztägiges `DUE`-Datum gesetzt. Nach der automatischen Übernahme wird die erkannte Uhrzeit aus dem Titel entfernt (`Zahnarzt 261112 1530` → `Zahnarzt 261112`), die Fälligkeit bleibt bei 15:30 Uhr. Bei späteren Titeländerungen ohne neue Uhrzeit bleibt die automatisch erkannte Uhrzeit erhalten. Bereits vorhandene manuelle Fälligkeiten bleiben unverändert. Automatisch erzeugte Fälligkeiten werden über `X-TASKDATE-AUTO-DUE` gekennzeichnet und bei Titeländerungen aktualisiert oder bei Entfernen des Datums gelöscht. Wird eine automatisch gesetzte Fälligkeit manuell geändert, fasst TaskDate sie nicht mehr an. Es wird **kein zusätzlicher Kalendereintrag** erstellt: Die bestehende Aufgabe erscheint bei aktivierter Aufgabenanzeige im Kalender.
+Die Nextcloud-DAV-Integration erfolgt über `OCP\\SabrePluginEvent` und ein SabreDAV-Plugin, das die eingehende Kalender-`PUT`-Anfrage **vor** der eigentlichen Speicherung anpasst. Es benötigt keine internen Klassen der DAV-App und erzeugt keinen zweiten Schreibvorgang. Die normalen CalDAV-Berechtigungen, Validierungen und Speicheroperationen bleiben Nextcloud überlassen.
 
-Version 0.2.1 korrigiert die Ereignisregistrierung für Nextcloud 35 (`OCP\\Calendar\\Events` statt `OCA\\DAV\\Events`).
+`TaskUpdatePlanner` berechnet die Änderung. `X-TASKDATE-AUTO-DUE` kennzeichnet automatisch verwaltete Fälligkeiten. Bereits manuell gesetzte oder veränderte Fälligkeiten bleiben unverändert, ebenso ausdrücklich gelöschte Fälligkeiten. Eine bei der Titelbereinigung entfernte Uhrzeit wird bei späteren Datumsänderungen nach Möglichkeit beibehalten.
 
-## Tests
+**Vorerst nicht automatisch bearbeitet:** Aufgaben mit `DTSTART`, `RRULE` oder `RECURRENCE-ID`. Damit sollen ungetestete Änderungen an Startzeiten und Wiederholungen vermieden werden. Bei Importen oder Bearbeitung mit externen CalDAV-Clients muss zusätzlich geprüft werden, ob diese die Kennzeichnung `X-TASKDATE-AUTO-DUE` erhalten.
+
+**Noch zu prüfen:** Zeitzonen und Sommerzeit, tatsächliche Nextcloud-35-Aufgabenflüsse (einschließlich Nextcloud Tasks), Starts und Wiederholungen, unterschiedliche Benutzerrechte, lesegeschützte Kalender sowie Verhalten anderer Clients. Zeitangaben ohne explizite Zone werden derzeit als iCalendar-Fließzeit gespeichert.
+
+## Entwicklung und Tests
 
 ```sh
+composer update --no-interaction --no-progress --prefer-dist
 php tests/date_parser_test.php
+php tests/task_update_planner_test.php
+php tests/task_write_policy_test.php
+php tests/sabre_put_test.php
+bash tests/release_staging_test.sh
+bash scripts/check-release-blockers.sh
 ```
 
-Eine minimale Praxisprüfung auf Nextcloud 35:
+Composer und `vendor/` werden ausschließlich für Entwicklungstests verwendet und **nicht** in die App gepackt. Der Test `sabre_put_test.php` verwendet echte SabreDAV-Request- und iCalendar-Objekte. Ein erfolgreicher Lauf ist kein Nachweis der Kompatibilität mit einer vollständigen Nextcloud-Installation.
 
-1. Aufgabe `Zahnarzt 20261112 1400` anlegen; Fälligkeit 12.11.2026, 14:00 Uhr prüfen.
-2. Titel auf `Zahnarzt 20261113 1430` ändern; Fälligkeit muss aktualisiert werden.
-3. Fälligkeit manuell ändern, anschließend Titel ändern; manuelle Fälligkeit muss erhalten bleiben.
-4. Neue Aufgabe mit manuell gesetzter Fälligkeit anlegen; diese darf nicht überschrieben werden.
-5. Titel einer automatisch terminierten Aufgabe ohne Datum speichern; automatisch gesetzte Fälligkeit muss verschwinden.
-6. Aufgabe im Kalender überprüfen (Aufgabenanzeige einschalten).
+## Testinstallation und App Store
 
-## Prüfung und bekannte Einschränkungen
+Für eine manuelle Testinstallation die App-Dateien unter `custom_apps/taskdate/` ablegen und mit `php occ app:enable taskdate` aktivieren. Vorher ein Backup bzw. eine separate Testinstanz verwenden.
 
-Die PHP-Syntaxprüfung und Parser-Regressionen werden über GitHub Actions ausgeführt (siehe den jeweils aktuellen PR-Prüflauf). Ein Test gegen eine echte Nextcloud-/CalDAV-Instanz steht ebenfalls aus. Insbesondere Zeitzonen, Wiederholungsaufgaben und die Verarbeitung externer Aufgabenclients bleiben zu prüfen.
+Die Freigabeschritte, Testmatrix, Signierung und verbleibenden Punkte stehen in [docs/APPSTORE_RELEASE.md](docs/APPSTORE_RELEASE.md). Der aktive Entwicklungsstand und die Übergabe stehen in [docs/HANDOVER.md](docs/HANDOVER.md).
 
-Die ursprüngliche Metadaten-Lizenz lautet `agpl`, während das Repository eine GPL-3.0-Lizenzdatei enthält. Diese Inkonsistenz sollte mit dem Rechteinhaber geklärt werden.
-
-## Nextcloud App Store / Entwicklung
-
-Die Vorbereitungen und aktuellen Freigabeblocker stehen in [docs/APPSTORE_RELEASE.md](docs/APPSTORE_RELEASE.md).
-Der Entwicklungsstand wird in [PR #1](https://github.com/lfflr/Taskdate/pull/1) erarbeitet.
-PHP-Syntax und erweiterte Parser-Regressionen wurden mit [GitHub Actions run 45819377473](https://github.com/lfflr/Taskdate/actions/runs/45819377473) bestanden.
-Das bestätigt **nicht** die Integrationsfähigkeit des Listeners: Eine produktive Veröffentlichung erfordert noch die Überprüfung und ggf. den Ersatz der internen CalDAV-Schreibschnittstelle, einen Nextcloud-35-Praxistest und die App-Signatur.
+Lizenz: GPL-3.0 (siehe `LICENSE`).

@@ -34,7 +34,7 @@ This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 comp
 
 ## Packaging checks (2026-11-27)
 
-A new `tests/release_staging_test.sh` validates unsigned staging structure and basic appinfo metadata, and is now invoked from the PHP CI workflow. The script does **not** sign the release or validate it against the official Nextcloud appinfo schema. Do not interpret a green staging test as App Store approval.
+A new `tests/release_staging_test.sh` validates unsigned staging structure and basic appinfo metadata, and is now invoked from the PHP CI workflow. [Run 45994185733](https://github.com/lfflr/Taskdate/actions/runs/45994185733) passed all five checks: syntax, parser, safety policy, event payload, and staging smoke test. The script does **not** sign the release or validate it against the official Nextcloud appinfo schema. Do not interpret a green staging test as App Store approval.
 
 ## Before approval
 

@@ -24,6 +24,14 @@ The listener now uses `TaskWritePolicy::allowsAutomaticDue()` and conservatively
 
 This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 compatibility. Task apps may populate `DTSTART` for ordinary tasks. The release remains blocked until that behavior is measured and a correct policy implemented. `tests/task_write_policy_test.php` documents the current safety contract.
 
+## Event payload handling (2026-11-27)
+
+- Prefer the current event's `getObjectData()['calendardata']`, which the Nextcloud DAV backend normally provides.
+- If missing, fall back to `getCalendarObject`, still an **internal** DAV dependency.
+- Reject absent/empty/non-string URIs and raw iCalendar payloads without trying to parse them.
+- `tests/calendar_payload_test.php` checks the payload validation but is **not** a live Nextcloud event-dispatch integration test.
+- The listener still writes with `OCA\\DAV\\CalDAV\\CalDavBackend::updateCalendarObject`. Public API and App Store compatibility remain blocked and must be investigated independently.
+
 ## Before approval
 
 - [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).
@@ -48,11 +56,10 @@ This is a **temporary behavioral limitation**, not evidence of Nextcloud 35 comp
 ## API risk (release blocker)
 
 The listener currently injects `OCA\\DAV\\CalDAV\\CalDavBackend` and calls
-`getCalendarObject` and `updateCalendarObject`. The OCP event supplies
-metadata but does not itself contain the raw iCalendar object. Reading it
-through the internal backend is implemented on this branch, but this is **not
-proof that the App Store will accept the dependency or that all calendars are
-safe to write**. Do not merge/release until a supported write architecture
+`getCalendarObject` and `updateCalendarObject`. The OCP event can contain raw iCalendar content; the listener now uses it
+when available and falls back to internal DAV read methods otherwise. This
+is **not proof that the App Store will accept the dependency or that all
+calendars are safe to write**. Do not merge/release until a supported write architecture
 and a Nextcloud 35 integration test are established.
 
 ## Private key and CSR (on your trusted computer)

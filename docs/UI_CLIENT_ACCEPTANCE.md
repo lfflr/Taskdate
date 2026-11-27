@@ -34,7 +34,7 @@
 
 ## Gruppe C – Sommerzeit und Zeitzonen
 
-- C1: `Termin 290327 0130` (Europe/Berlin, vor Beginn der Sommerzeit 2029) und `Termin 291028 0130` (vor Ende der Sommerzeit) anlegen und sowohl im Browser als auch im externen Client vergleichen.
+- C1: `Termin 270328 0130` (Europe/Berlin, Beginn der Sommerzeit 2027) und `Termin 271031 0130` (Ende der Sommerzeit 2027) anlegen und sowohl im Browser als auch im externen Client vergleichen.
 - C2: Lokale nicht existierende Stunde beim Wechsel in die Sommerzeit und doppelte Stunde beim Wechsel zurück **als offenen Sonderfall dokumentieren**, nicht als garantiert korrekt darstellen.
 - C3: `heute`/`morgen` kurz vor und nach Mitternacht in der Benutzerzeitzone gegen Serverzeitzone prüfen.
 - C4: Beim Wechsel zwischen Browser- und Client-Zeitzone darf eine explizit zonierte bestehende Fälligkeit nicht stillschweigend ersetzt werden.

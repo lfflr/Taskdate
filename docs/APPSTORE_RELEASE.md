@@ -21,7 +21,7 @@ Verifizierte Quellcode-Bezüge:
 - https://github.com/sabre-io/dav/blob/master/lib/DAV/Server.php
 - https://github.com/sabre-io/http/blob/master/lib/Message.php
 
-**Achtung:** Die eigenständigen SabreDAV-Tests beweisen noch nicht, dass Nextcloud Tasks auf jeder unterstützten Nextcloud-Version genau diesen PUT-Pfad verwendet. Keine öffentliche Freigabe ohne Praxistest.
+**Achtung:** Die eigenständigen SabreDAV-Tests und der inzwischen erfolgreiche Docker-CalDAV-Test belegen den Schreibweg auf einer Nextcloud-35.0.3.2-Instanz. Die Nextcloud-Tasks-Oberfläche, externe Clients und andere Versionen bleiben trotzdem gesondert abzunehmen.
 
 ## 2. Behobene technische Punkte
 
@@ -32,7 +32,7 @@ Verifizierte Quellcode-Bezüge:
 - Unpassende DAV-Pfade, VEVENT und unlesbare iCalendar-Daten werden nicht verändert.
 - SabreHTTP kann Body-Streams bei `getBodyAsString()` verbrauchen: die Originaldaten werden bei unveränderten Anfragen nun wiederhergestellt.
 - Bei bekannten großen `Content-Length`-Werten wird das Lesen übersprungen; nach einer Änderung wird die Länge aktualisiert.
-- Die App-Metadaten verwenden `gpl`, passend zur vorhandenen GPL-3.0-Lizenzdatei (keine Änderung am Lizenztext).
+- Die App-Metadaten verwenden `GPL-3.0-only`, passend zur vorhandenen GPL-3.0-Lizenzdatei (keine Änderung am Lizenztext).
 - Der Release-Staging-Test packt nur Laufzeitdateien, App-Icon und LICENSE.
 
 ## 3. Automatisierte Prüfungen
@@ -52,11 +52,13 @@ Nachweise:
 - [Run #65](https://github.com/lfflr/Taskdate/actions/runs/46029347331): manuell gelöschte Fälligkeiten werden nicht wieder eingesetzt.
 - [Run #79](https://github.com/lfflr/Taskdate/actions/runs/46030136176): deklaratives Plugin, verzögerte Registrierung, `method:PUT`-Priorität vor CorePlugin und alle Paket-/Sicherheitstests erfolgreich.
 
-Tests ersetzen ausdrücklich **nicht** die echte Nextcloud-35-Prüfung.
+**Erfolgreicher echter Nextcloud-35-CalDAV-Test:** [GitHub Actions #4](https://github.com/lfflr/Taskdate/actions/runs/46033274589), Commit `c5e164e16c05d20bbdd65793f77f10a6d5ae43d7`. Nextcloud 35.0.3.2 aus dem offiziellen Docker-Image wurde mit SQLite neu installiert; TaskDate 0.2.3 ließ sich aktivieren. Über authentifizierte CalDAV-`MKCALENDAR`, `PUT` und `GET` wurden folgende Fälle erfolgreich geprüft: Fälligkeit+Titelbereinigung, Datumsänderung mit Uhrzeiterhalt, manuelle Fälligkeiten, DTSTART-Schutz, ganztägiges DUE, manuelle DUE-Entfernung trotz bestehendem Marker und Abweisung falscher Anmeldedaten. Kein Nutzer-Produktivsystem wurde verändert.
 
-## 4. Gebündelter Praxistest – Freigabegruppe A
+**Testgrenzen:** Dieser automatisierte Test nutzt direkte HTTP-Requests und keinen echten Nextcloud-Tasks-Browserlauf; die Tests laufen in einer frischen SQLite-Testinstanz mit Admin-Kalender und prüfen nicht geteilte oder schreibgeschützte Kalender, MariaDB/PostgreSQL, Zeitzonenübergänge, Wiederholungen oder einen externen CalDAV-Client. Aussagen zur NC33-/NC34-Kompatibilität sind weiterhin offen.
 
-Nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:
+## 4. Gebündelte ergänzende Praxistests – Freigabegruppe A
+
+Die serverseitigen Standardfälle sind mit der isolierten Docker-Instanz bereits getestet. Für die verbleibende **UI-/Client-Abnahme** nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:
 
 1. App aus dem PR-Branch nach `custom_apps/taskdate` installieren und aktivieren.
 2. In Nextcloud Tasks `Zahnarzt 261112 1530` anlegen. Prüfen: DUE 12.11.2026 15:30, Titel `Zahnarzt 261112`, Anzeige im Kalender bei aktivierten Aufgaben.
@@ -76,7 +78,8 @@ Besonders wichtig: Prüfen, ob Nextcloud Tasks bei gewöhnlichen Aufgaben automa
 - [x] Kein direkter Zugriff der aktiven App auf `OCA\\DAV\\CalDAV\\CalDavBackend`.
 - [x] GPL-Metadaten zur vorhandenen Lizenzdatei passend.
 - [x] Parser-, Planner-, SabreDAV- und Packaging-Testläufe dokumentiert.
-- [ ] End-to-End auf Nextcloud 35 erfolgreich, einschließlich aller Fälle aus Gruppe A.
+- [x] Serverseitiges CalDAV-End-to-End auf Nextcloud 35.0.3.2 mit Docker und echtem HTTP-Verkehr bestanden.
+- [ ] Ergänzende UI-/Client-/Zeitzonen-/Rechte-Abnahme aus Gruppe A vollständig durchführen.
 - [ ] Nextcloud 33/34 nur dann als kompatibel deklarieren, wenn passend verifiziert; andernfalls Versionsbereich einschränken.
 - [ ] Rechte an sämtlichen Quellen/Lizenzinhaberschaft klären.
 - [ ] App-Icon visuell prüfen und Screenshots aufnehmen.
@@ -104,6 +107,8 @@ tar -czf taskdate.tar.gz taskdate
 ```
 
 Die Dateien in `dist/taskdate` nach der Signierung nicht mehr verändern. Der Upload in den App Store darf erst auf Grundlage des signierten GitHub-Releases erfolgen.
+
+Der veröffentlichungsfähige Status ist weiterhin **NICHT FREIGEGEBEN**: offene UI-/Client-/Zeitzonen-Abnahme sowie App-ID, Screenshots, Signaturzertifikat und Paketunterschrift.
 
 Offizielle Nextcloud-Dokumentation:
 - https://docs.nextcloud.com/server/stable/developer_manual/app_publishing_maintenance/release_process.html

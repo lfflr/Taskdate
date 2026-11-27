@@ -22,11 +22,12 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 
 ## P2: Nextcloud-35-End-to-End – gebündelte Nutzerabnahme
 
-- [ ] In separater NC35-Testinstanz installieren und registrierten PUT-Hook prüfen.
+- [x] In isoliertem Docker-Nextcloud 35.0.3.2 die App aktivieren, den registrierten PUT-Hook und die CalDAV-Speicherung testen; [GitHub Actions #4](https://github.com/lfflr/Taskdate/actions/runs/46033274589) erfolgreich.
 - [ ] Nextcloud Tasks, externen CalDAV-Client, Rechte und geteilte Kalender testen.
 - [ ] DTSTART bei normalen Tasks prüfen; vorerst vorsichtshalber ausgenommen.
 - [ ] Wiederholungen, Sommer-/Winterzeit und ganztägige Aufgaben testen.
-- [ ] Manuellen DUE-Schutz, Titelbereinigung, Update-Sync und Kalenderanzeige abnehmen.
+- [x] CalDAV-HTTP-Roundtrips für automatische DUE, Titelbereinigung, Datumsänderung mit Uhrzeiterhalt, manuelle DUE und DUE-Löschung, ganztägige DUE, DTSTART-Ausnahme und unberechtigte PUTs geprüft.
+- [ ] Sichtprüfung in Nextcloud Tasks und Kalender einschließlich Client-Synchronisation durchführen.
 - [ ] Festgestellte Probleme im gleichen Entwicklungspaket lösen und relevante Tests ergänzen.
 - [ ] Kompatibilitätsdeklaration 33–35 nur nach Nachweisen beibehalten.
 
@@ -40,4 +41,4 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 
 ## Nächster Schritt
 
-Nicht weitere Kleinkorrekturen ohne Nachweis, sondern die **gebündelte Nextcloud-35-Testmatrix (P2)**. App-Store-Freigabe erst nach dieser Testphase.
+Der technische Serverteil von P2 ist in Nextcloud 35.0.3.2 mit echten CalDAV-Anfragen bestanden. Als nächstes **gebündelte UI-/Client-Abnahme** (Nextcloud Tasks, Kalender, Zeitzonen, externe Clients und Rechte). App-Store-Freigabe erst nach vollständiger Abnahme.

@@ -25,9 +25,12 @@ if ((string)$xml->id !== "taskdate") { fwrite(STDERR, "Wrong app ID\n"); exit(1)
 if (!preg_match("/^\d+\.\d+\.\d+$/", (string)$xml->version)) {
   fwrite(STDERR, "Invalid app version\n"); exit(1);
 }
-if ((string)$xml->types->type !== "dav"
+if (count($xml->types->dav) !== 1
     || (string)$xml->sabre->plugins->plugin !== "OCA\\TaskDate\\Sabre\\TaskDateSabrePlugin") {
-  fwrite(STDERR, "Missing declarative DAV plugin registration\\n"); exit(1);
+  fwrite(STDERR, "Missing declarative DAV plugin registration\n"); exit(1);
+}
+if ((string)$xml->licence !== "GPL-3.0-only") {
+  fwrite(STDERR, "Expected GPL-3.0-only metadata\\n"); exit(1);
 }
 if (trim((string)$xml->author) === "" || trim((string)$xml->name) === "") {
   fwrite(STDERR, "Missing author/name\n"); exit(1);

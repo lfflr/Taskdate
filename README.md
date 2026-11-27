@@ -2,7 +2,7 @@
 
 TaskDate erkennt Datums- und Uhrzeitangaben in Nextcloud-Aufgabentiteln (VTODO) und setzt automatisch das Fälligkeitsdatum. Bei einer erkannten Uhrzeit wird diese aus dem Titel entfernt. Es entsteht **kein zusätzlicher Kalendereintrag**: Die bestehende Aufgabe kann mit aktivierter Aufgabenanzeige im Kalender erscheinen.
 
-**Status:** 0.2.3 ist ein Entwicklungskandidat in [PR #1](https://github.com/lfflr/Taskdate/pull/1). Kein freigegebenes App-Store-Release. Nextcloud 33–35 ist deklariert; ein realer CalDAV-Integrationstest auf Nextcloud 35.0.3.2 wurde erfolgreich durchgeführt. Nextcloud Tasks als Benutzeroberfläche, externe Clients, Rechte und Zeitzonen sowie Nextcloud 33/34 sind noch nicht vollständig abgenommen.
+**Status:** 0.2.3 ist ein Entwicklungskandidat in [PR #1](https://github.com/lfflr/Taskdate/pull/1). Kein freigegebenes App-Store-Release. Nextcloud 33–35 ist deklariert; direkte CalDAV-Integrationstests auf Nextcloud 33, 34 und 35 wurden erfolgreich durchgeführt. Nextcloud Tasks als Benutzeroberfläche, externe Clients, geteilte Kalender und Zeitzonen sind noch nicht vollständig abgenommen.
 
 ## Beispiele
 
@@ -37,7 +37,7 @@ bash tests/release_staging_test.sh
 bash scripts/check-release-blockers.sh
 ```
 
-Composer und `vendor/` werden ausschließlich für Entwicklungstests verwendet und **nicht** in die App gepackt. Der Test `sabre_put_test.php` verwendet echte SabreDAV-Request- und iCalendar-Objekte. Zusätzlich führt [GitHub Actions – Nextcloud 35 Integration](https://github.com/lfflr/Taskdate/actions/runs/46033274589) den Installations- und CalDAV-PUT/GET-Test in einer vollständigen Docker-Nextcloud 35.0.3.2 mit aktivierter App aus. Dieser automatisierte Servertest ist bestanden, ersetzt aber keinen umfassenden Nextcloud-Tasks-Browser- und Client-Test.
+Composer und `vendor/` werden ausschließlich für Entwicklungstests verwendet und **nicht** in die App gepackt. Der Test `sabre_put_test.php` verwendet echte SabreDAV-Request- und iCalendar-Objekte. Zusätzlich führt [GitHub Actions – Nextcloud 33–35 Integration](https://github.com/lfflr/Taskdate/actions/runs/46059594089) die Installations- und CalDAV-PUT/GET-Tests in getrennten vollständigen Docker-Nextcloud-33-, -34- und -35-Instanzen mit aktivierter App aus. Alle drei automatisierten Servertests sind bestanden. Ein separater [NC35-Zweibenutzer-/Sicherheitstest](https://github.com/lfflr/Taskdate/actions/runs/46059313311) bestätigt Cross-User-ACL und ETag-Schutz. Diese Tests ersetzen keinen Nextcloud-Tasks-Browser- und Drittclient-Test.
 
 ## Testinstallation und App Store
 

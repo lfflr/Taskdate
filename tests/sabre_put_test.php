@@ -22,6 +22,24 @@ if ($server->getPlugin('taskdate') !== $plugin) {
     throw new RuntimeException('Sabre plugin registration failed');
 }
 
+
+// Mimic Nextcloud: the DAV app loads third-party plugins while handling
+// beforeMethod:*, after the event listener list has already been assembled.
+// Our method:PUT listener must still be present for the subsequent method event.
+$lateServer = new Server();
+$latePlugin = new TaskDateSabrePlugin();
+$lateServer->on('beforeMethod:*', static function () use ($lateServer, $latePlugin): void {
+    $lateServer->addPlugin($latePlugin);
+}, 30);
+$lateRequest = new Request('PUT', '/remote.php/dav/calendars/alice/tasks/late.ics');
+$lateRequest->setBaseUrl('/remote.php/dav/');
+$lateServer->emit('beforeMethod:PUT', [$lateRequest, new Response()]);
+$listeners = $lateServer->listeners('method:PUT');
+if (count($listeners) < 2
+    || $listeners[0] !== [$latePlugin, 'handlePut']) {
+    throw new RuntimeException('TaskDate must run before Sabre CorePlugin PUT handler');
+}
+
 function taskIcs(string $summary, ?string $due = null, ?string $managed = null, ?string $extra = null): string {
     $props = [
         'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//TaskDate integration test//EN',

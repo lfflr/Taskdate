@@ -10,6 +10,14 @@
     <author>lfflr</author>
     <namespace>TaskDate</namespace>
     <category>organization</category>
+    <types>
+        <type>dav</type>
+    </types>
+    <sabre>
+        <plugins>
+            <plugin>OCA\TaskDate\Sabre\TaskDateSabrePlugin</plugin>
+        </plugins>
+    </sabre>
     <website>https://github.com/lfflr/Taskdate</website>
     <bugs>https://github.com/lfflr/Taskdate/issues</bugs>
     <dependencies>

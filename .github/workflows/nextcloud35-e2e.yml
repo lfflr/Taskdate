@@ -43,6 +43,10 @@ jobs:
           docker exec taskdate-nc35 chown -R www-data:www-data /var/www/html/custom_apps/taskdate
           docker exec -u www-data taskdate-nc35 php occ app:enable taskdate
           docker exec -u www-data taskdate-nc35 php occ app:list | grep -F 'taskdate: 0.2.3'
+      - name: Create separate non-admin CalDAV test user
+        run: |
+          docker exec -u www-data -e OC_PASS=taskdate-second-user taskdate-nc35 \
+            php occ user:add --password-from-env taskdateuser
       - name: Wait for Apache HTTP readiness
         run: |
           ready=0

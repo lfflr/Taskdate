@@ -36,12 +36,17 @@ class TaskDateListener implements IEventListener {
                 return;
             }
 
-            // OCP calendar events supply metadata, not necessarily calendardata.
-            $stored = $this->backend->getCalendarObject($calendarId, $uri);
-            if (!is_array($stored) || !isset($stored['calendardata']) || !is_string($stored['calendardata'])) {
+            // Nextcloud 35's calendar object event generally includes calendardata.
+            // Prefer that snapshot; fall back to the backend for older payloads.
+            $rawData = $object['calendardata'] ?? null;
+            if (!is_string($rawData) || $rawData === '') {
+                $stored = $this->backend->getCalendarObject($calendarId, $uri);
+                $rawData = is_array($stored) ? ($stored['calendardata'] ?? null) : null;
+            }
+            if (!is_string($rawData) || $rawData === '') {
                 return;
             }
-            $vobj = Reader::read($stored['calendardata']);
+            $vobj = Reader::read($rawData);
             $todo = $vobj->VTODO ?? null;
             if ($todo === null || !TaskWritePolicy::allowsAutomaticDue($todo)) {
                 return;

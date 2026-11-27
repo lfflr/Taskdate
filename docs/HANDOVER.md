@@ -71,15 +71,27 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 - **Keine Migrationen**, keine produktiven Daten verändert, kein Release oder Merge.
 - Weitere technische Tests (gemischte Zeitzonen, Sommerzeit, geteilte Kalender, externer Client) und tatsächliche Nextcloud-Tasks-Oberfläche sind **nicht** bestanden oder ausgeführt.
 
+## Weiteres Entwicklungspaket – Zeitzonenschutz (2026-11-27)
+
+- `lib/Sabre/TaskDateSabrePlugin.php` schützt nun explizite DUE-Zeitzonen (`TZID` oder UTC-`Z`), eingebettete `VTIMEZONE`, gemischte `VEVENT`/`VTODO`-Dateien und Kalender mit mehreren `VTODO`-Komponenten vor einer teilweisen oder falschen Umschreibung. Die Originaldaten werden unverändert an Nextcloud weitergegeben.
+- `tests/sabre_put_test.php` enthält dazu fünf zusätzliche Tests für fremde Zeitzonen-/Mehrkomponenten-Dateien.
+- [PHP-/SabreDAV-Lauf #109](https://github.com/lfflr/Taskdate/actions/runs/46060744527) erfolgreich.
+- [NC33–35-Docker-CalDAV-Matrix #23](https://github.com/lfflr/Taskdate/actions/runs/46060744540) erfolgreich: alle drei Versionen mit echtem HTTP-Integrationslauf.
+- `docs/UI_CLIENT_ACCEPTANCE.md` bündelt die noch nicht ausgeführte Abnahme in A (Nextcloud Tasks/Kalender), B (Client/Rechte/Teilen) und C (Zeitzonen/DST) mit Ergebnisprotokoll.
+- In `docs/DEVELOPMENT_PLAN.md` und `docs/APPSTORE_RELEASE.md` sind Schutzgrenzen und verbleibende Freigabeschritte dokumentiert.
+- **Keine Migrationen**, keine produktiven Daten verändert, kein Merge, Tag oder Release. Neues Code-Testcommit: `12c6bc520e7f290b1eab9946e8c90f95124fe1ed`.
+
+**Wichtig:** Die Zeitzonen-Regressionen prüfen das **bewusste Nicht-Umschreiben** explizit zonierter oder gemischter Dateien. Sie bestätigen noch keine korrekte lokale Sommer-/Winterzeitumrechnung für alle Clients. Die aktuelle floating-time-Semantik und die Ermittlung der Benutzerzeitzone sind vor der Freigabe weiterhin fachlich zu prüfen.
+
 ## Noch offen / Abnahmekriterien
 
 - **Höchste Priorität:** Ergänzende Nextcloud-35-UI-/Client-Abnahme mit Tasks-Anlage/Bearbeitung, Kalenderdarstellung, geteilten Kalendern und externer Client-Synchronisation. Der automatische CalDAV-Server-Test hat die deklarative Plugineinbindung und den tatsächlichen `method:PUT`-Pfad für direkte HTTP-Clients bestätigt. Jetzt insbesondere prüfen, ob Nextcloud Tasks und externe Clients dieselben fachlichen Ergebnisse liefern.
 - Basis-ACL (Cross-User) und veraltete ETags im echten CalDAV-Test bestanden. Weitere Freigabe-/Teilen-Rechte, Locking und Client-Synchronisation müssen noch abgeprüft werden.
-- Die Berechnung verwendet noch lokale iCalendar-Fließzeit; Benutzerzeitzonen, Sommer-/Winterzeit und andere Clients überprüfen.
+- Die Berechnung verwendet weiterhin iCalendar-Fließzeit; Benutzerzeitzonen und Sommer-/Winterzeit noch prüfen. Explizit zonierte/UTC-Fälligkeiten und gemischte Kalenderdateien werden jetzt konservativ nicht verändert.
 - Normale Tasks mit `DTSTART` werden übersprungen; nur nach nachgewiesenem Verhalten erweitern.
 - Lizenzrechtsinhaber/Rechte, Screenshots, App-ID, Zertifikat/Signatur, offizieller App-Store-Eintrag.
 - Vollständige Liste und Schritte: `docs/APPSTORE_RELEASE.md`.
 
 ## Nächste gebündelte Phase
 
-Gemäß `docs/DEVELOPMENT_PLAN.md` ist **P2 mit direktem CalDAV-Serververkehr auf NC33, NC34 und NC35 getestet**. Verbleibt: gemeinsame UI-/Client-/Zeitzonen-/Rechte-Abnahme sowie P3 (Zertifikat, Signatur und App-Store-Eintrag). Bis zu deren Abschluss bleibt PR #1 ein Entwurf und darf nicht als stabiles App-Store-Release veröffentlicht werden. Beim Abschließen dieses Pakets erneut Ausgangs-/End-SHA, geänderte Dateien, Migrationen, ausgeführte Tests, PR/Release/ZIP und nächsten Schritt dokumentieren.
+Gemäß `docs/DEVELOPMENT_PLAN.md` ist **P2 mit direktem CalDAV-Serververkehr auf NC33, NC34 und NC35 getestet**. Die restliche UI-/Client-Abnahme liegt vollständig in `docs/UI_CLIENT_ACCEPTANCE.md`. Verbleibt: gemeinsame UI-/Client-/Zeitzonen-/Rechte-Abnahme sowie P3 (Zertifikat, Signatur und App-Store-Eintrag). Bis zu deren Abschluss bleibt PR #1 ein Entwurf und darf nicht als stabiles App-Store-Release veröffentlicht werden. Beim Abschließen dieses Pakets erneut Ausgangs-/End-SHA, geänderte Dateien, Migrationen, ausgeführte Tests, PR/Release/ZIP und nächsten Schritt dokumentieren.

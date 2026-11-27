@@ -5,7 +5,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 bash "$repo_root/scripts/prepare-release.sh" "$tmp"
 app="$tmp/taskdate"
-for file in appinfo/info.xml lib/AppInfo/Application.php lib/Listener/TaskDateListener.php lib/DateParser.php lib/TaskWritePolicy.php lib/CalendarPayload.php img/app.svg LICENSE; do
+for file in appinfo/info.xml lib/AppInfo/Application.php lib/Sabre/TaskDateSabrePlugin.php lib/Listener/RegisterSabrePluginListener.php lib/DateParser.php lib/TaskWritePolicy.php lib/TaskUpdatePlanner.php img/app.svg LICENSE; do
   test -f "$app/$file" || { echo "Missing runtime file: $file" >&2; exit 1; }
 done
 if find "$app" -type f \( -name '*.key' -o -name '*.csr' -o -name '*.pem' -o -name 'signature.json' \) | grep -q .; then

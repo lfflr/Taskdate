@@ -82,6 +82,53 @@ if grep -Eq '^DUE(;|:)' "$temp/removed-after.ics"; then
 fi
 echo "PASS: manually deleted DUE not recreated"
 
+
+# Repeat and malformed content should never receive TaskDate's auto-due.
+make_ics "recurring" "Wiederkehrend 261112 1530" "RRULE:FREQ=DAILY;COUNT=3"
+put "recurring" "$temp/recurring.ics" "put-recurring"
+fetch "recurring" "recurring-after.ics"
+grep -Fq 'SUMMARY:Wiederkehrend 261112 1530' "$temp/recurring-after.ics"
+if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/recurring-after.ics"; then
+  echo "FAIL: recurrence unexpectedly rewritten" >&2
+  exit 1
+fi
+echo "PASS: RRULE task remains unchanged"
+
+# A second account must receive the same application behavior, but cannot
+# write into the first account's private calendar.
+other="taskdateuser"
+other_pass="taskdate-second-user"
+other_calendar="$base/remote.php/dav/calendars/$other/taskdate-e2e"
+http="$(curl -sS -u "$other:$other_pass" -X MKCALENDAR \
+  -H 'Content-Type: application/xml' --data-binary @"$temp/calendar.xml" \
+  -o "$temp/mk-other" -w '%{http_code}' "$other_calendar/")"
+check "$http" "201,204"
+make_ics "other" "Anderer 261112 1537" ""
+http="$(curl -sS -u "$other:$other_pass" -X PUT -H 'Content-Type: text/calendar' \
+  --data-binary @"$temp/other.ics" -o "$temp/put-other" -w '%{http_code}' "$other_calendar/other.ics")"
+check "$http" "201,204"
+http="$(curl -sS -u "$other:$other_pass" -o "$temp/other-after.ics" -w '%{http_code}' "$other_calendar/other.ics")"
+check "$http" "200"
+grep -Fq 'SUMMARY:Anderer 261112' "$temp/other-after.ics"
+grep -Fq 'DUE:20261112T153700' "$temp/other-after.ics"
+echo "PASS: separate user receives TaskDate transformation"
+
+http="$(curl -sS -u "$other:$other_pass" -X PUT -H 'Content-Type: text/calendar' \
+  --data-binary @"$temp/other.ics" -o "$temp/forbidden" -w '%{http_code}' "$calendar/forbidden.ics")"
+check "$http" "403,404"
+http="$(curl -sS -u "$user:$pass" -o "$temp/no-forbidden" -w '%{http_code}' "$calendar/forbidden.ics")"
+check "$http" "404"
+echo "PASS: cross-user write access blocked and no task created"
+
+# A stale ETag must not overwrite the task.
+http="$(curl -sS -u "$user:$pass" -X PUT -H 'Content-Type: text/calendar' \
+  -H 'If-Match: "definitely-stale-etag"' \
+  --data-binary @"$temp/manual.ics" -o "$temp/stale" -w '%{http_code}' "$calendar/manual.ics")"
+check "$http" "412"
+fetch "manual" "manual-still.ics"
+grep -Fq 'DUE:20261112T120000' "$temp/manual-still.ics"
+echo "PASS: ETag precondition prevents overwrite"
+
 http="$(curl -sS -u "$user:incorrect-password" -X PUT -H 'Content-Type: text/calendar' \
   --data-binary @"$temp/auto.ics" -o "$temp/unauth" -w '%{http_code}' "$calendar/unauth.ics")"
 check "$http" "401,403"

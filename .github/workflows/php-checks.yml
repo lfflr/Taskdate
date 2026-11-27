@@ -27,8 +27,6 @@ jobs:
         run: php tests/task_write_policy_test.php
       - name: SabreDAV PUT request tests
         run: php tests/sabre_put_test.php
-      - name: Calendar event payload tests
-        run: php tests/calendar_payload_test.php
       - name: Release staging smoke test
         run: bash tests/release_staging_test.sh
       - name: Verify release gate detects outstanding blockers

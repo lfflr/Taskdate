@@ -43,6 +43,20 @@ jobs:
           docker exec taskdate-nc35 chown -R www-data:www-data /var/www/html/custom_apps/taskdate
           docker exec -u www-data taskdate-nc35 php occ app:enable taskdate
           docker exec -u www-data taskdate-nc35 php occ app:list | grep -F 'taskdate: 0.2.3'
+      - name: Wait for Apache HTTP readiness
+        run: |
+          ready=0
+          for i in $(seq 1 90); do
+            if test "$(curl -sS --max-time 3 -o /dev/null -w '%{http_code}' http://127.0.0.1:18085/status.php 2>/dev/null || true)" = "200"; then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if test "$ready" != 1; then
+            docker logs --tail 100 taskdate-nc35
+            exit 1
+          fi
       - name: Exercise authenticated CalDAV PUT and GET round trips
         run: bash tests/nextcloud35_e2e.sh
       - name: Show diagnostic logs on failure

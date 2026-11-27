@@ -26,6 +26,7 @@
 - https://github.com/lfflr/Taskdate/actions/runs/46029284782 – Stream-Body-Regressionsfälle bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46029347331 – Regression nach manuell gelöschtem DUE bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46029894457 – deklarative DAV-Registrierung, echter SabreDAV-PUT-Test und Paketprüfung bestanden.
+- https://github.com/lfflr/Taskdate/actions/runs/46030136176 – endgültige `method:PUT`-Prioritätsreihenfolge (vor Sabre CorePlugin), PHP-Syntax, Parser, Planner, Stream, Paket und statisches Release-Gate bestanden. Geprüfter Code-SHA: `bbf37072be9fe91ce2e12538150ddfa8069607d3`.
 
 Keine automatische Prüfung ist ein Ersatz für die noch ausstehende echte NC35-Installation. Für letzte Doku-Commits neue CI-Ergebnisse abwarten, nicht ungeprüft auf grün schließen.
 

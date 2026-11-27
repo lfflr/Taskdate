@@ -6,7 +6,7 @@
 **Entwicklungsbranch:** `release/appstore-readiness-2026-11-26`  
 **PR:** https://github.com/lfflr/Taskdate/pull/1 (Entwurf; nicht mergen ohne NC35-Abnahme).  
 **App-Version des Kandidaten:** 0.2.3.  
-**Letzter geprüfter Doku-Commit vor dieser Übergabe:** `97f7635b7ef6c7451460c3d81afd1e12fd763af1`.  
+**Wichtiger Code-Stand:** Commit `dd688d3d12a2c3e9bc67f8ed3949cc58d2727b3b` umfasst die deklarative DAV-Registrierung und deren Pakettest.  
 **End-SHA:** Zur Überprüfung GitHub-HEAD dieses Branches abrufen; die HANDOVER-Datei selbst erzeugt einen weiteren Commit.
 
 ## Übernommene Arbeit
@@ -25,13 +25,14 @@
 - https://github.com/lfflr/Taskdate/actions/runs/46029191536 – realer SabreDAV-PUT-Request-Test und statisches API-/Lizenz-Gate bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46029284782 – Stream-Body-Regressionsfälle bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46029347331 – Regression nach manuell gelöschtem DUE bestanden.
+- https://github.com/lfflr/Taskdate/actions/runs/46029894457 – deklarative DAV-Registrierung, echter SabreDAV-PUT-Test und Paketprüfung bestanden.
 
 Keine automatische Prüfung ist ein Ersatz für die noch ausstehende echte NC35-Installation. Für letzte Doku-Commits neue CI-Ergebnisse abwarten, nicht ungeprüft auf grün schließen.
 
 ## Geänderte/neu angelegte Hauptdateien im größeren Block
 
-- `lib/AppInfo/Application.php` – alte Ereignis-Listener durch SabrePluginEvent ersetzt.
-- `lib/Listener/RegisterSabrePluginListener.php` – Registrierung.
+- `appinfo/info.xml` – Sabre-Plugin deklarativ über `types/dav` und `sabre/plugins` registriert.
+- `lib/AppInfo/Application.php` – kein konkurrierender Event-Listener mehr.
 - `lib/Sabre/TaskDateSabrePlugin.php` – HTTP-PUT-Verarbeitung mit Stream-Recovery.
 - `lib/TaskUpdatePlanner.php` – reine Logik.
 - `lib/TaskWritePolicy.php` – konservative Beschränkungen.
@@ -40,13 +41,13 @@ Keine automatische Prüfung ist ein Ersatz für die noch ausstehende echte NC35-
 - `.github/workflows/php-checks.yml`, `composer.json` – automatisierte Tests (Composer nur dev).
 - `scripts/prepare-release.sh`, `scripts/check-release-blockers.sh`, `tests/release_staging_test.sh` – Paket/Gate.
 - `appinfo/info.xml`, `README.md`, `docs/APPSTORE_RELEASE.md`, `docs/DEVELOPMENT_PLAN.md`.
-- **Entfernt:** `lib/Listener/TaskDateListener.php`, `lib/CalendarPayload.php`, `tests/calendar_payload_test.php`.
+- **Entfernt:** `lib/Listener/TaskDateListener.php`, `lib/Listener/RegisterSabrePluginListener.php`, `lib/CalendarPayload.php`, `tests/calendar_payload_test.php`.
 
 **Migrationen:** keine; keine Datenbankänderungen und keine produktiven Daten betroffen.
 
 ## Noch offen / Abnahmekriterien
 
-- **Höchste Priorität:** Vollständige Testinstallation auf Nextcloud 35, echte Tasks-Anlage und -Bearbeitung, Rechte und externer Client. Besonders überprüfen, ob das öffentliche `SabrePluginEvent` im benötigten DAV-Lauf ausgelöst wird.
+- **Höchste Priorität:** Vollständige Testinstallation auf Nextcloud 35, echte Tasks-Anlage und -Bearbeitung, Rechte und externer Client. Besonders prüfen, ob `TaskDateSabrePlugin` über den deklarativen DAV-PluginManager geladen wird und tatsächlich `beforeMethod:PUT` für Nextcloud Tasks erreicht.
 - Sicherstellen, dass die neue Plugin-Kette bei produktiven CalDAV-PUTs mit Berechtigungen, Locking, ETag, Validierung und Speicherung zusammenarbeitet.
 - Die Berechnung verwendet noch lokale iCalendar-Fließzeit; Benutzerzeitzonen, Sommer-/Winterzeit und andere Clients überprüfen.
 - Normale Tasks mit `DTSTART` werden übersprungen; nur nach nachgewiesenem Verhalten erweitern.

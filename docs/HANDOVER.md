@@ -33,6 +33,8 @@
 - https://github.com/lfflr/Taskdate/actions/runs/46059313311 – zweiter Nicht-Admin-Nutzer, zwei eigene Kalender, Verbot fremder Schreibzugriffe, ETag-Preconditions und RRULE-Schutz bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46059594089 – **NC 33, NC 34, NC 35 jeweils bestanden** in eigener Docker-Instanz mit allen automatisierten CalDAV-Funktionstests.
 - https://github.com/lfflr/Taskdate/actions/runs/46059594103 – PHP-/SabreDAV-Tests vor abschließender Workflow-Auslöserbereinigung bestanden.
+- https://github.com/lfflr/Taskdate/actions/runs/46059735589 – **erneute vollständige NC33/34/35-Matrix nach CI-Trigger-Änderungen: 3/3 erfolgreich**.
+- https://github.com/lfflr/Taskdate/actions/runs/46059735429 – PHP-/SabreDAV-/Paket-/Release-Gate nach CI-Trigger-Änderungen erfolgreich.
 
 Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bestanden; sie ersetzt **keine** UI-/Client-/Zeitzonen-/Freigabe-Rechte-Abnahme. Fehlgeschlagene E2E-Vorläufe #1 (falsche MKCALENDAR-Namespace) und #2 (Apache noch nicht HTTP-bereit) wurden im Testaufbau korrigiert; der abschließende erweitere Lauf #4 ist grün.
 

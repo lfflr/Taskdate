@@ -22,4 +22,17 @@ foreach ($invalid as $payload) {
         throw new RuntimeException('Invalid calendar event payload accepted');
     }
 }
-echo "CalendarPayload: 5 cases passed\n";
+$components = [
+    [['component' => 'VTODO'], true],
+    [['component' => 'vtodo'], true],
+    [['component' => 'VEVENT'], false],
+    [['component' => 'VJOURNAL'], false],
+    [['component' => ''], true],
+    [[], true],
+];
+foreach ($components as [$object, $expected]) {
+    if (CalendarPayload::mayContainTodo($object) !== $expected) {
+        throw new RuntimeException('Component filter failed: ' . var_export($object, true));
+    }
+}
+echo "CalendarPayload: 11 cases passed\\n";

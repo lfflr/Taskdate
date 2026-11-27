@@ -19,6 +19,8 @@ jobs:
         run: find lib tests -name '*.php' -print0 | xargs -0 -n1 php -l
       - name: Parser tests
         run: php tests/date_parser_test.php
+      - name: Task update planner tests
+        run: php tests/task_update_planner_test.php
       - name: Task write safety tests
         run: php tests/task_write_policy_test.php
       - name: Calendar event payload tests

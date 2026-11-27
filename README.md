@@ -23,6 +23,8 @@ Die Nextcloud-DAV-Integration erfolgt deklarativ über `appinfo/info.xml` (`type
 
 **Vorerst nicht automatisch bearbeitet:** Aufgaben mit `DTSTART`, `RRULE` oder `RECURRENCE-ID`. Damit sollen ungetestete Änderungen an Startzeiten und Wiederholungen vermieden werden. Bei Importen oder Bearbeitung mit externen CalDAV-Clients muss zusätzlich geprüft werden, ob diese die Kennzeichnung `X-TASKDATE-AUTO-DUE` erhalten.
 
+**Zeitzonenschutz:** VTODOs mit ausdrücklich zonierter oder UTC-Fälligkeit, eingebetteter VTIMEZONE oder mehreren/gemischten Kalenderkomponenten werden vorerst unverändert weitergereicht. TaskDate führt derzeit keine allgemeine Benutzerzeitzonen-Konvertierung durch. Die zusätzlichen Schutzfälle sind automatisiert getestet.
+
 **Noch zu prüfen:** Zeitzonen und Sommerzeit, tatsächliche Nextcloud-35-Aufgabenflüsse (einschließlich Nextcloud Tasks), Starts und Wiederholungen, unterschiedliche Benutzerrechte, lesegeschützte Kalender sowie Verhalten anderer Clients. Zeitangaben ohne explizite Zone werden derzeit als iCalendar-Fließzeit gespeichert.
 
 ## Entwicklung und Tests

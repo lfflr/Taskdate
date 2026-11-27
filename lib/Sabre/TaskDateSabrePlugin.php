@@ -26,8 +26,12 @@ final class TaskDateSabrePlugin extends ServerPlugin {
     }
 
     public function initialize(Server $server): void {
-        // After the standard auth/ACL plugins; before the DAV PUT handler.
-        $server->on('beforeMethod:PUT', [$this, 'handlePut'], 60);
+        // Nextcloud loads app plugins during beforeMethod:* (priority 30).
+        // Its event listener list is snapshotted before emission, so a newly
+        // registered beforeMethod:PUT handler would miss this very request.
+        // method:PUT is emitted afterwards: priority 60 runs before Sabre's
+        // CorePlugin handler at the default priority 100.
+        $server->on('method:PUT', [$this, 'handlePut'], 60);
     }
 
     public function handlePut($request, $response): void {

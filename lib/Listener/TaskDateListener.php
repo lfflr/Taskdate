@@ -7,8 +7,8 @@ use OCA\DAV\CalDAV\CalDavBackend;
 use OCP\Calendar\Events\CalendarObjectCreatedEvent;
 use OCP\Calendar\Events\CalendarObjectUpdatedEvent;
 use OCA\TaskDate\CalendarPayload;
-use OCA\TaskDate\DateParser;
 use OCA\TaskDate\TaskWritePolicy;
+use OCA\TaskDate\TaskUpdatePlanner;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use Psr\Log\LoggerInterface;
@@ -64,31 +64,24 @@ class TaskDateListener implements IEventListener {
                 return;
             }
 
-            $parsed = DateParser::parse((string)$todo->SUMMARY, new \DateTimeImmutable('now'));
-            if ($parsed === null) {
-                // Remove only dates previously created by TaskDate.
-                if ($managed && $currentDue !== null) {
-                    unset($todo->DUE);
-                    unset($todo->{self::AUTO_DUE_PROPERTY});
-                    $this->backend->updateCalendarObject($calendarId, $uri, $vobj->serialize());
-                }
+            $title = (string)$todo->SUMMARY;
+            $plan = TaskUpdatePlanner::plan(
+                $title,
+                $currentDue,
+                $oldAutoDue,
+                new \DateTimeImmutable('now')
+            );
+            if ($plan === null) {
                 return;
             }
-            [$date, $hasTime] = $parsed;
-
-            // The listener runs a second time after it removes the time from SUMMARY.
-            // Retain the previously extracted time while TaskDate still manages DUE.
-            if (!$hasTime && $managed && $oldAutoDue !== null && strlen($oldAutoDue) === 15) {
-                $date = $date->setTime((int)substr($oldAutoDue, 9, 2), (int)substr($oldAutoDue, 11, 2));
-                $hasTime = true;
+            if ($plan['due'] === null) {
+                unset($todo->DUE);
+                unset($todo->{self::AUTO_DUE_PROPERTY});
+                $this->backend->updateCalendarObject($calendarId, $uri, $vobj->serialize());
+                return;
             }
-
-            $due = $hasTime ? $date->format('Ymd\THis') : $date->format('Ymd');
-            $title = (string)$todo->SUMMARY;
-            $cleanTitle = $hasTime ? DateParser::withoutTime($title, $date) : $title;
-            if ($currentDue === $due && $managed && $cleanTitle === $title) {
-                return; // also prevents the update event from writing again
-            }
+            $due = $plan['due'];
+            $cleanTitle = $plan['summary'];
 
             if (isset($todo->DUE)) {
                 unset($todo->DUE);

@@ -46,6 +46,12 @@ class TaskDateListener implements IEventListener {
                 return;
             }
 
+            // Do not silently rewrite recurring tasks or tasks whose DTSTART
+            // constrains DUE. These require separate timezone/recurrence handling.
+            if (isset($todo->RRULE) || isset($todo->{'RECURRENCE-ID'}) || isset($todo->DTSTART)) {
+                return;
+            }
+
             $managed = isset($todo->{self::AUTO_DUE_PROPERTY});
             $oldAutoDue = $managed ? (string)$todo->{self::AUTO_DUE_PROPERTY} : null;
             $currentDue = isset($todo->DUE) ? (string)$todo->DUE : null;

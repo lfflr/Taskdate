@@ -12,7 +12,8 @@ Development branch: release/appstore-readiness-2026-11-26
 - Extended compact HHMM parsing from quarter-hours to arbitrary valid minutes (`1405`, `1537`, `2359`), with parser and title-cleanup regression tests.
 - Changes are confined to PR #1; no App Store release, tag or signature has been issued.
 - Existing task-write architecture continues to depend on an internal Nextcloud DAV backend and is **not cleared for the App Store**.
-- PHP CI for the expanded minute handling must be confirmed before merging.
+- Expanded HHMM parser regression tests and PHP syntax passed in [CI run 45940606432](https://github.com/lfflr/Taskdate/actions/runs/45940606432), commit `4f12096f4ec9923c85672edbb3db449da6fcf318`.
+- This remains a parser test, **not** a Nextcloud 35 integration test.
 
 ## Before approval
 

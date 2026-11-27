@@ -44,7 +44,7 @@ jobs:
       - name: Verify Nextcloud major version
         run: |
           docker exec -u www-data taskdate-nc35 php occ status --output=json | tee "$RUNNER_TEMP/nextcloud-status.json"
-          grep -Eq '"versionstring"[[:space:]]*:[[:space:]]*"${{ matrix.nextcloud }}\\.' "$RUNNER_TEMP/nextcloud-status.json"
+          grep -Eq '"versionstring"[[:space:]]*:[[:space:]]*"${{ matrix.nextcloud }}\.' "$RUNNER_TEMP/nextcloud-status.json"
       - name: Install TaskDate from staged runtime files
         run: |
           docker cp "$RUNNER_TEMP/stage/taskdate" taskdate-nc35:/var/www/html/custom_apps/taskdate

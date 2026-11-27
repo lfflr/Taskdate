@@ -7,7 +7,7 @@ cd "$root"
 # No secrets or app signing keys belong in this repository.
 blocked=0
 
-if grep -R -n -E '(^|[[:space:]])use[[:space:]]+OCA\\\\DAV\\\\|\\\\OCA\\\\DAV\\\\' lib --include='*.php'; then
+if grep -R -n -F --include='*.php' 'OCA\DAV\' lib; then
   printf '%s\n' 'BLOCKER: private Nextcloud DAV implementation used by TaskDate.'
   blocked=1
 fi

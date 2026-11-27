@@ -6,6 +6,7 @@ namespace OCA\TaskDate\Listener;
 use OCA\DAV\CalDAV\CalDavBackend;
 use OCP\Calendar\Events\CalendarObjectCreatedEvent;
 use OCP\Calendar\Events\CalendarObjectUpdatedEvent;
+use OCA\TaskDate\CalendarPayload;
 use OCA\TaskDate\DateParser;
 use OCA\TaskDate\TaskWritePolicy;
 use OCP\EventDispatcher\Event;
@@ -31,19 +32,19 @@ class TaskDateListener implements IEventListener {
         try {
             $calendarId = $event->getCalendarId();
             $object = $event->getObjectData();
-            $uri = $object['uri'] ?? null;
-            if (!is_string($uri) || $uri === '') {
+            $uri = CalendarPayload::uri($object);
+            if ($uri === null) {
                 return;
             }
 
             // Nextcloud 35's calendar object event generally includes calendardata.
             // Prefer that snapshot; fall back to the backend for older payloads.
-            $rawData = $object['calendardata'] ?? null;
-            if (!is_string($rawData) || $rawData === '') {
+            $rawData = CalendarPayload::calendarData($object);
+            if ($rawData === null) {
                 $stored = $this->backend->getCalendarObject($calendarId, $uri);
-                $rawData = is_array($stored) ? ($stored['calendardata'] ?? null) : null;
+                $rawData = is_array($stored) ? CalendarPayload::calendarData($stored) : null;
             }
-            if (!is_string($rawData) || $rawData === '') {
+            if ($rawData === null) {
                 return;
             }
             $vobj = Reader::read($rawData);

@@ -50,6 +50,7 @@ Nachweise:
 - [Run #61](https://github.com/lfflr/Taskdate/actions/runs/46029191536): öffentliche Sabre-Architektur und statische Release-Prüfung erfolgreich.
 - [Run #63](https://github.com/lfflr/Taskdate/actions/runs/46029284782): Testfall für Stream-Body erfolgreich.
 - [Run #65](https://github.com/lfflr/Taskdate/actions/runs/46029347331): manuell gelöschte Fälligkeiten werden nicht wieder eingesetzt.
+- [Run #79](https://github.com/lfflr/Taskdate/actions/runs/46030136176): deklaratives Plugin, verzögerte Registrierung, `method:PUT`-Priorität vor CorePlugin und alle Paket-/Sicherheitstests erfolgreich.
 
 Tests ersetzen ausdrücklich **nicht** die echte Nextcloud-35-Prüfung.
 

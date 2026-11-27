@@ -25,3 +25,13 @@ jobs:
         run: php tests/calendar_payload_test.php
       - name: Release staging smoke test
         run: bash tests/release_staging_test.sh
+      - name: Verify release gate detects outstanding blockers
+        run: |
+          if bash scripts/check-release-blockers.sh > release-gate.log 2>&1; then
+            echo 'Release gate unexpectedly allowed publication'
+            cat release-gate.log
+            exit 1
+          fi
+          grep -F 'private Nextcloud DAV implementation' release-gate.log
+          grep -F 'conflicts with the GPL-3.0' release-gate.log
+          grep -F 'Release gate: BLOCKED' release-gate.log

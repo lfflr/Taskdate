@@ -18,7 +18,7 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 - [x] Stream-Body wiederherstellen, falls PUT nicht verändert wird.
 - [x] GPL-Lizenzmetadaten an vorhandene LICENSE anpassen.
 - [x] SabreDAV- und Parser-Tests sowie Paketkontrolle über CI.
-- [ ] Tests auf aktuellem PR-HEAD noch einmal prüfen, sobald CI beendet ist.
+- [x] Neue Plugin-Registrierungsreihenfolge und alle Komponententests erfolgreich in GitHub Actions [#79](https://github.com/lfflr/Taskdate/actions/runs/46030136176) geprüft (Code-Commit `bbf37072be9fe91ce2e12538150ddfa8069607d3`). Reine Dokumentations-Commits nach diesem Code-Stand ändern keine Laufzeitlogik.
 
 ## P2: Nextcloud-35-End-to-End – gebündelte Nutzerabnahme
 

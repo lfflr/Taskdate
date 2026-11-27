@@ -60,10 +60,23 @@ final class TaskDateSabrePlugin extends ServerPlugin {
                 return;
             }
             $vobj = Reader::read($raw);
-            if (!isset($vobj->VTODO) || isset($vobj->VEVENT)) {
+            // Be conservative with mixed/multi-component documents and
+            // explicit timezone definitions until client timezone semantics
+            // have been verified. Never partially rewrite a calendar object.
+            if (count($vobj->select('VTODO')) !== 1
+                || count($vobj->select('VEVENT')) !== 0
+                || count($vobj->select('VJOURNAL')) !== 0
+                || count($vobj->select('VTIMEZONE')) !== 0) {
                 return;
             }
             $todo = $vobj->VTODO;
+            // TaskDate creates floating times. Do not silently discard a
+            // foreign client's explicit DUE timezone on subsequent edits.
+            if (isset($todo->DUE)
+                && (isset($todo->DUE['TZID'])
+                    || str_ends_with((string)$todo->DUE, 'Z'))) {
+                return;
+            }
             if (!TaskWritePolicy::allowsAutomaticDue($todo)) {
                 return;
             }

@@ -43,6 +43,12 @@ The previous description claiming that Nextcloud 35 events generally include `ca
 
 [CI run 46022264052](https://github.com/lfflr/Taskdate/actions/runs/46022264052) succeeded for PHP syntax, parser, task-write safety, event payload filtering, and staging verification at commit `56e0f42fb32e9b371afd2530c906d0f402bb25af`. This does not establish Nextcloud 35 integration or public API compatibility.
 
+## Static App Store gate (2026-11-27)
+
+Run `bash scripts/check-release-blockers.sh` from any working directory. The script is expected to exit nonzero on this branch and report the two outstanding blockers: use of the internal `OCA\\DAV\\CalDAV\\CalDavBackend` implementation, and `appinfo/info.xml` claiming AGPL when the included `LICENSE` is GPL-3.0. CI explicitly verifies that **both** blockers are detected instead of treating a successful staging smoke test as release readiness.
+
+The script is a **pre-release static guard only**. Passing it in a future branch will not replace a live Nextcloud 35 integration test, public API architecture review, signing or App Store submission.
+
 ## Before approval
 
 - [x] Automated PHP syntax and baseline parser tests passed in run 45755694292 (previous commit).

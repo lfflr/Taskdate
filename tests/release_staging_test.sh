@@ -5,14 +5,14 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 bash "$repo_root/scripts/prepare-release.sh" "$tmp"
 app="$tmp/taskdate"
-for file in appinfo/info.xml lib/AppInfo/Application.php lib/Listener/TaskDateListener.php lib/DateParser.php lib/TaskWritePolicy.php lib/CalendarPayload.php img/app.svg; do
+for file in appinfo/info.xml lib/AppInfo/Application.php lib/Listener/TaskDateListener.php lib/DateParser.php lib/TaskWritePolicy.php lib/CalendarPayload.php img/app.svg LICENSE; do
   test -f "$app/$file" || { echo "Missing runtime file: $file" >&2; exit 1; }
 done
 if find "$app" -type f \( -name '*.key' -o -name '*.csr' -o -name '*.pem' -o -name 'signature.json' \) | grep -q .; then
   echo "Unsigned staging must not contain keys, CSRs or signatures" >&2
   exit 1
 fi
-for item in .git .github tests docs scripts LICENSE README.md; do
+for item in .git .github tests docs scripts README.md; do
   if test -e "$app/$item"; then
     echo "Unexpected non-runtime artifact: $item" >&2
     exit 1

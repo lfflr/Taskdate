@@ -6,8 +6,8 @@
 **Entwicklungsbranch:** `release/appstore-readiness-2026-11-26`  
 **PR:** https://github.com/lfflr/Taskdate/pull/1 (Entwurf; nicht mergen ohne NC35-Abnahme).  
 **App-Version des Kandidaten:** 0.2.3.  
-**Wichtiger Code-Stand:** Commit `dd688d3d12a2c3e9bc67f8ed3949cc58d2727b3b` umfasst die deklarative DAV-Registrierung und deren Pakettest.  
-**End-SHA:** Zur Überprüfung GitHub-HEAD dieses Branches abrufen; die HANDOVER-Datei selbst erzeugt einen weiteren Commit.
+**Verifizierter Code-Stand:** `c5e164e16c05d20bbdd65793f77f10a6d5ae43d7`, Nextcloud 35.0.3.2 CalDAV-End-to-End [Run #4](https://github.com/lfflr/Taskdate/actions/runs/46033274589) bestanden.  
+**Stand vor letzter Dokumentationsaktualisierung:** `dd30d2ddd3eb9f4450c2f6da7adc2ce75508f989`; den finalen Branch-HEAD nach Änderungen erneut direkt aus GitHub abrufen.
 
 ## Übernommene Arbeit
 
@@ -16,7 +16,7 @@
 3. `TaskUpdatePlanner` kapselt Aufgabenumwandlung; manuelle DUE, geänderte oder gelöschte Fälligkeit, idempotente Updates, Titelbereinigung und automatische Marker berücksichtigt.
 4. `TaskWritePolicy` schützt vor Änderungen an DTSTART- und Wiederholungsaufgaben. Dies ist bewusst eingeschränkt.
 5. CalDAV-HTTP-Request-Tests mit echten SabreDAV- und VObject-Klassen einschließlich Stream-Body-Reparatur hinzugefügt.
-6. LICENSE wurde nicht neu lizenziert; `appinfo/info.xml` zeigt nun `gpl` passend zu GPL-3.0 im Repository.
+6. LICENSE wurde nicht neu lizenziert; `appinfo/info.xml` zeigt nun `GPL-3.0-only` passend zu GPL-3.0 im Repository; `<types><dav/></types>` entspricht der Nextcloud-35-App-Deklaration.
 7. Release-Staging, statisches API-/Lizenz-Gate, README und `docs/APPSTORE_RELEASE.md` aktualisiert.
 8. Ausführlicher P1-P3-Plan in `docs/DEVELOPMENT_PLAN.md`.
 
@@ -26,9 +26,11 @@
 - https://github.com/lfflr/Taskdate/actions/runs/46029284782 – Stream-Body-Regressionsfälle bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46029347331 – Regression nach manuell gelöschtem DUE bestanden.
 - https://github.com/lfflr/Taskdate/actions/runs/46029894457 – deklarative DAV-Registrierung, echter SabreDAV-PUT-Test und Paketprüfung bestanden.
-- https://github.com/lfflr/Taskdate/actions/runs/46030136176 – endgültige `method:PUT`-Prioritätsreihenfolge (vor Sabre CorePlugin), PHP-Syntax, Parser, Planner, Stream, Paket und statisches Release-Gate bestanden. Geprüfter Code-SHA: `bbf37072be9fe91ce2e12538150ddfa8069607d3`.
+- https://github.com/lfflr/Taskdate/actions/runs/46030136176 – `method:PUT`-Prioritätsreihenfolge (vor Sabre CorePlugin), PHP-Syntax, Parser, Planner, Stream, Paket und statisches Release-Gate bestanden. Geprüfter Code-SHA: `bbf37072be9fe91ce2e12538150ddfa8069607d3`.
+- https://github.com/lfflr/Taskdate/actions/runs/46033104910 – PHP-/SabreDAV-/Paketprüfung nach XML-Korrekturen bestanden.
+- https://github.com/lfflr/Taskdate/actions/runs/46033274589 – **erfolgreicher echter End-to-End-Test** auf frischer Nextcloud **35.0.3.2**: Installation/Aktivierung von TaskDate, CalDAV-PUT/GET für automatisches DUE und Titel, Datumsänderung, manuellen Schutz, ganztägiges DUE, manuelle DUE-Entfernung, DTSTART und ungültige Authentifizierung.
 
-Keine automatische Prüfung ist ein Ersatz für die noch ausstehende echte NC35-Installation. Für letzte Doku-Commits neue CI-Ergebnisse abwarten, nicht ungeprüft auf grün schließen.
+Die echte Nextcloud-35-Serverintegration ist im isolierten Docker-Test bestanden; sie ersetzt **keine** UI-/Client-/Zeitzonen-/Rechte-Abnahme. Fehlgeschlagene E2E-Vorläufe #1 (falsche MKCALENDAR-Namespace) und #2 (Apache noch nicht HTTP-bereit) wurden im Testaufbau korrigiert; der abschließende erweitere Lauf #4 ist grün.
 
 ## Geänderte/neu angelegte Hauptdateien im größeren Block
 
@@ -46,9 +48,18 @@ Keine automatische Prüfung ist ein Ersatz für die noch ausstehende echte NC35-
 
 **Migrationen:** keine; keine Datenbankänderungen und keine produktiven Daten betroffen.
 
+## Neues Integrationspaket (2026-11-27)
+
+- Neu: `tests/nextcloud35_e2e.sh` und `.github/workflows/nextcloud35-e2e.yml` – GitHub Actions führt echte CalDAV-Requests in einer wegwerfbaren Nextcloud-35-Installation aus.
+- `appinfo/info.xml` verwendet jetzt die gültige DAV-Type-Kennzeichnung `<dav/>` und die explizite SPDX-Lizenz `GPL-3.0-only`.
+- `tests/release_staging_test.sh` validiert die korrigierte App-Registrierung.
+- Die Installations-/HTTP-Readiness-Schritte wurden getestet; ein gesonderter Apache-Startcheck vermeidet Verbindungsabbrüche.
+- **Keine Migrationen** und **keine Änderungen an produktiven Daten**.
+- Verifizierter Code-SHA: `c5e164e16c05d20bbdd65793f77f10a6d5ae43d7`.
+
 ## Noch offen / Abnahmekriterien
 
-- **Höchste Priorität:** Vollständige Testinstallation auf Nextcloud 35, echte Tasks-Anlage und -Bearbeitung, Rechte und externer Client. Besonders prüfen, ob `TaskDateSabrePlugin` über den deklarativen DAV-PluginManager geladen wird und tatsächlich `beforeMethod:PUT` für Nextcloud Tasks erreicht.
+- **Höchste Priorität:** Ergänzende Nextcloud-35-UI-/Client-Abnahme mit Tasks-Anlage/Bearbeitung, Kalenderdarstellung, geteilten Kalendern und externer Client-Synchronisation. Der automatische CalDAV-Server-Test hat die deklarative Plugineinbindung und den tatsächlichen `method:PUT`-Pfad für direkte HTTP-Clients bestätigt. Jetzt insbesondere prüfen, ob Nextcloud Tasks und externe Clients dieselben fachlichen Ergebnisse liefern.
 - Sicherstellen, dass die neue Plugin-Kette bei produktiven CalDAV-PUTs mit Berechtigungen, Locking, ETag, Validierung und Speicherung zusammenarbeitet.
 - Die Berechnung verwendet noch lokale iCalendar-Fließzeit; Benutzerzeitzonen, Sommer-/Winterzeit und andere Clients überprüfen.
 - Normale Tasks mit `DTSTART` werden übersprungen; nur nach nachgewiesenem Verhalten erweitern.
@@ -57,4 +68,4 @@ Keine automatische Prüfung ist ein Ersatz für die noch ausstehende echte NC35-
 
 ## Nächste gebündelte Phase
 
-Gemäß `docs/DEVELOPMENT_PLAN.md` **P2: Nextcloud-35-End-to-End**. Bis zu deren Abnahme ist PR #1 ein Entwurf und darf nicht als stabiles App-Store-Release veröffentlicht werden. Beim Abschließen dieses Pakets erneut Ausgangs-/End-SHA, geänderte Dateien, Migrationen, ausgeführte Tests, PR/Release/ZIP und nächsten Schritt dokumentieren.
+Gemäß `docs/DEVELOPMENT_PLAN.md` ist **P2 serverseitig getestet**. Verbleibt: gemeinsame UI-/Client-/Zeitzonen-/Rechte-Abnahme sowie P3 (Zertifikat, Signatur und App-Store-Eintrag). Bis zu deren Abschluss bleibt PR #1 ein Entwurf und darf nicht als stabiles App-Store-Release veröffentlicht werden. Beim Abschließen dieses Pakets erneut Ausgangs-/End-SHA, geänderte Dateien, Migrationen, ausgeführte Tests, PR/Release/ZIP und nächsten Schritt dokumentieren.

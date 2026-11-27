@@ -13,7 +13,7 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 ## P1: DAV-Architektur und Komponententests – Entwicklungskandidat
 
 - [x] Interne DAV-Backend-Abhängigkeit aus der aktiven Implementierung entfernen.
-- [x] CalDAV-Anfragen mit `OCP\\SabrePluginEvent` und SabreDAV-Plugin vor Speicherung bearbeiten.
+- [x] CalDAV-Anfragen mit deklarativ über `appinfo/info.xml` registriertem SabreDAV-Plugin vor der Speicherung bearbeiten.
 - [x] Planner für manuelle DUE, Titelbereinigung und Idempotenz extrahieren.
 - [x] Stream-Body wiederherstellen, falls PUT nicht verändert wird.
 - [x] GPL-Lizenzmetadaten an vorhandene LICENSE anpassen.

@@ -6,12 +6,12 @@
     <summary>Setzt das Fälligkeitsdatum von Aufgaben automatisch aus dem Titel</summary>
     <description>Erkennt Datumsangaben im Aufgabentitel (z. B. "Zahnarzt 12.11.", "Bericht morgen 14 Uhr", "Steuer am Freitag") und trägt sie als Fälligkeitsdatum ein. Aufgaben mit Fälligkeit erscheinen auch im Kalender.</description>
     <version>0.2.3</version>
-    <licence>gpl</licence>
+    <licence>GPL-3.0-only</licence>
     <author>lfflr</author>
     <namespace>TaskDate</namespace>
     <category>organization</category>
     <types>
-        <type>dav</type>
+        <dav/>
     </types>
     <sabre>
         <plugins>

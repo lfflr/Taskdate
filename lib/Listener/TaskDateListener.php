@@ -32,13 +32,16 @@ class TaskDateListener implements IEventListener {
         try {
             $calendarId = $event->getCalendarId();
             $object = $event->getObjectData();
+            if (!CalendarPayload::mayContainTodo($object)) {
+                return;
+            }
             $uri = CalendarPayload::uri($object);
             if ($uri === null) {
                 return;
             }
 
-            // Nextcloud 35's calendar object event generally includes calendardata.
-            // Prefer that snapshot; fall back to the backend for older payloads.
+            // Event metadata does not guarantee raw calendardata.
+            // Use it when supplied, otherwise fetch the complete object.
             $rawData = CalendarPayload::calendarData($object);
             if ($rawData === null) {
                 $stored = $this->backend->getCalendarObject($calendarId, $uri);

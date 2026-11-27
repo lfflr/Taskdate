@@ -158,5 +158,41 @@ if ((string)Reader::read($request->getBodyAsString())->VTODO->SUMMARY !== 'Strea
 }
 fclose($stream);
 
-echo "TaskDate SabreDAV request tests: 5 rewrites, 5 exclusions, 4 stream cases passed\n";
+
+// Foreign calendar clients may send UTC dates, explicit TZIDs or multiple
+// components. These documents must be forwarded byte-for-byte, not partially
+// converted into floating local times.
+$foreign = [
+    taskIcs('UTC 261112 1530', '20261112T120000Z',
+        '20261112T120000Z'),
+    str_replace(
+        'DUE:20261112T120000',
+        'DUE;TZID=Europe/Berlin:20261112T120000',
+        taskIcs('Zone 261112 1530', '20261112T120000',
+            '20261112T120000')
+    ),
+    str_replace(
+        'END:VCALENDAR',
+        "BEGIN:VTODO\r\nUID:another@example.invalid\r\nSUMMARY:Second 261112 1530\r\nEND:VTODO\r\nEND:VCALENDAR",
+        taskIcs('First 261112 1530')
+    ),
+    str_replace(
+        'BEGIN:VTODO',
+        "BEGIN:VTIMEZONE\r\nTZID:Europe/Berlin\r\nEND:VTIMEZONE\r\nBEGIN:VTODO",
+        taskIcs('With timezone 261112 1530')
+    ),
+    str_replace(
+        'END:VCALENDAR',
+        "BEGIN:VEVENT\r\nUID:event@example.invalid\r\nDTSTAMP:20261110T000000Z\r\nDTSTART:20261112T140000\r\nSUMMARY:Event\r\nEND:VEVENT\r\nEND:VCALENDAR",
+        taskIcs('Mixed 261112 1530')
+    ),
+];
+foreach ($foreign as $i => $ics) {
+    [$unchangedBody] = runPut($ics);
+    if ($unchangedBody !== $ics) {
+        throw new RuntimeException("External timezone/multicomponent case $i was changed");
+    }
+}
+echo "TaskDate SabreDAV request tests: 5 rewrites, 5 exclusions, 4 stream cases, 5 foreign ICS cases passed\n";
+
 

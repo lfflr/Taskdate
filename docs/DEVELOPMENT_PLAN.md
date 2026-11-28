@@ -50,3 +50,6 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 ## Nächster Schritt
 
 Der technische CalDAV-Serverteil von P2 ist auf Nextcloud 33, 34 und 35 bestanden. Es folgen **gebündelte UI-/Client-Abnahme** (Nextcloud Tasks, Kalender, Zeitzonen, externe Clients und geteilte Kalender) sowie Signierung und Veröffentlichung in P3. Keine App-Store-Freigabe vor vollständiger Abnahme.
+
+
+**Testvorgabe vom 28.11.2026:** Auf ausdrücklichen Wunsch des Projektinhabers werden **keine neuen Tests auf Nextcloud 35** ausgeführt. Neue automatische Integrationstests ausschließlich auf **Nextcloud 33 und 34**. Frühere NC35-Ergebnisse bleiben historische Nachweise, aber keine Aufforderung zur erneuten Prüfung. Die Angabe unterstützter Versionen und die spätere Veröffentlichung sind davon getrennte Entscheidungen.

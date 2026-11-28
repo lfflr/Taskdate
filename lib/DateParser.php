@@ -89,12 +89,59 @@ class DateParser {
             $h = (int)$t[1];
             $min = isset($t[2]) && $t[2] !== '' ? (int)$t[2] : 0;
             if ($h < 24 && $min < 60) {
+                if (!self::safeLocalTime($date, $h, $min)) {
+                    // A missing or doubled wall-clock hour is not a unique due time.
+                    return null;
+                }
                 $date = $date->setTime($h, $min);
                 $hasTime = true;
             }
         }
 
         return [$date, $hasTime];
+    }
+
+    /**
+     * Reject nonexistent and ambiguous wall-clock times on timezone changes.
+     * Otherwise PHP silently normalizes missing hours or chooses one
+     * of two possible instants. Fixed-offset zones have no such transitions.
+     */
+    private static function safeLocalTime(DateTimeImmutable $day, int $hour, int $minute): bool {
+        $candidate = $day->setTime($hour, $minute);
+        if ((int)$candidate->format('G') !== $hour
+            || (int)$candidate->format('i') !== $minute
+            || $candidate->format('Y-m-d') !== $day->format('Y-m-d')) {
+            return false;
+        }
+
+        $instant = $candidate->getTimestamp();
+        $transitions = $day->getTimezone()->getTransitions($instant - 172800, $instant + 172800);
+        if (!is_array($transitions)) {
+            return true;
+        }
+
+        $wallSeconds = gmmktime(
+            $hour,
+            $minute,
+            0,
+            (int)$day->format('n'),
+            (int)$day->format('j'),
+            (int)$day->format('Y')
+        );
+        $previousOffset = null;
+        foreach ($transitions as $transition) {
+            $newOffset = (int)$transition['offset'];
+            if ($previousOffset !== null && $newOffset < $previousOffset) {
+                // Clock moved backwards; wall time occurs twice.
+                $repeatedStart = (int)$transition['ts'] + $newOffset;
+                $repeatedEnd = (int)$transition['ts'] + $previousOffset;
+                if ($wallSeconds >= $repeatedStart && $wallSeconds < $repeatedEnd) {
+                    return false;
+                }
+            }
+            $previousOffset = $newOffset;
+        }
+        return true;
     }
 
     /** Entfernt nur die erkannte Uhrzeit; das Datum und der übrige Titel bleiben erhalten. */

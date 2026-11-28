@@ -94,6 +94,39 @@ if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/recurring-after.ics"; then
 fi
 echo "PASS: RRULE task remains unchanged"
 
+# Third-party clients can carry explicitly zoned DUE properties. Preserve
+# them and do not turn UTC or TZID data into floating time.
+make_ics "utc" "UTC Termin 261112 1530" "DUE:20261112T120000Z"
+put "utc" "$temp/utc.ics" "put-utc"
+fetch "utc" "utc-after.ics"
+grep -Fq 'SUMMARY:UTC Termin 261112 1530' "$temp/utc-after.ics"
+grep -Fq 'DUE:20261112T120000Z' "$temp/utc-after.ics"
+if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/utc-after.ics"; then
+  echo "FAIL: UTC DUE unexpectedly auto-managed" >&2
+  exit 1
+fi
+echo "PASS: UTC DUE preserved"
+
+make_ics "tzid" "Zone Termin 261112 1530" "DUE;TZID=Europe/Berlin:20261112T120000"
+put "tzid" "$temp/tzid.ics" "put-tzid"
+fetch "tzid" "tzid-after.ics"
+grep -Fq 'SUMMARY:Zone Termin 261112 1530' "$temp/tzid-after.ics"
+grep -Fq 'DUE;TZID=Europe/Berlin:20261112T120000' "$temp/tzid-after.ics"
+if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/tzid-after.ics"; then
+  echo "FAIL: TZID DUE unexpectedly auto-managed" >&2
+  exit 1
+fi
+echo "PASS: TZID DUE preserved"
+
+# Verify that unrelated properties survive automatic title rewriting.
+make_ics "metadata" "Metadaten 261112 1405" "DESCRIPTION:Notiz zum Termin"
+put "metadata" "$temp/metadata.ics" "put-metadata"
+fetch "metadata" "metadata-after.ics"
+grep -Fq 'DESCRIPTION:Notiz zum Termin' "$temp/metadata-after.ics"
+grep -Fq 'SUMMARY:Metadaten 261112' "$temp/metadata-after.ics"
+grep -Fq 'DUE:20261112T140500' "$temp/metadata-after.ics"
+echo "PASS: VTODO description preserved after transformation"
+
 # A second account must receive the same application behavior, but cannot
 # write into the first account's private calendar.
 other="taskdateuser"
@@ -133,4 +166,4 @@ http="$(curl -sS -u "$user:incorrect-password" -X PUT -H 'Content-Type: text/cal
   --data-binary @"$temp/auto.ics" -o "$temp/unauth" -w '%{http_code}' "$calendar/unauth.ics")"
 check "$http" "401,403"
 echo "PASS: unauthorized PUT rejected"
-echo "Nextcloud 35 CalDAV end-to-end checks passed"
+echo "Nextcloud CalDAV end-to-end checks passed"

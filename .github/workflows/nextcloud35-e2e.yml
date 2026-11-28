@@ -60,8 +60,8 @@ jobs:
             php occ user:add --password-from-env taskdateuser
       - name: Configure distinct user timezones
         run: |
-          docker exec -u www-data taskdate-nc35 php occ user:setting admin core timezone --value=Europe/Berlin
-          docker exec -u www-data taskdate-nc35 php occ user:setting taskdateuser core timezone --value=UTC
+          docker exec -u www-data taskdate-nc35 php occ user:setting admin core timezone Europe/Berlin
+          docker exec -u www-data taskdate-nc35 php occ user:setting taskdateuser core timezone UTC
           docker exec -u www-data taskdate-nc35 php occ user:setting admin core timezone | grep -Fx 'Europe/Berlin'
           docker exec -u www-data taskdate-nc35 php occ user:setting taskdateuser core timezone | grep -Fx 'UTC'
       - name: Wait for Apache HTTP readiness

@@ -102,11 +102,22 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 - Implementierter Code-Stand: `8bc192de288cd44d8f1bc794636132f46ec6f3f7`.
 - Keine Migrationen, kein Merge, kein Release, keine produktiven Daten berührt.
 
+## Benutzerzeitzonen im DAV-Pfad – Abschlussblock (2026-11-28)
+
+- `lib/Sabre/TaskDateSabrePlugin.php`: Verwendung der öffentlichen Nextcloud-Dienste `OCP\\IUserSession` und `OCP\\IDateTimeZone`. Für jeden authentifizierten CalDAV-Aufruf wird die Zeitzone des zugehörigen Benutzers statt der PHP-Serverzeitzone verwendet. Fehlt der Benutzer-/Dienstkontext, bleibt die ursprüngliche Anfrage unverändert; das Plugin überschreibt keine Fälligkeit auf Basis einer ungeprüften Zone.
+- `tests/sabre_put_test.php`: In isolierten Sabre-Tests wird eine deterministische Zeitzone injiziert; reale Nextcloud-Dienste werden dort nicht vorgetäuscht.
+- `.github/workflows/nextcloud35-e2e.yml`: Einrichtung zweier Testkonten mit `Europe/Berlin` und `UTC` über Nextcloud-`occ`.
+- `tests/nextcloud35_e2e.sh`: echte CalDAV-`PUT`-/`GET`-Prüfung derselben lokalen Uhrzeit (`02:30`) am 28.03.2027 (Sommerzeit-Lücke) und 31.10.2027 (Winterzeit-Doppelung). Im Berliner Benutzerkonto bleibt sie unverändert; im UTC-Testkonto wird eine gültige Fälligkeit gebildet.
+- **Bestanden:** [NC33–35-Matrix #48](https://github.com/lfflr/Taskdate/actions/runs/46109440198), **alle drei Serverversionen erfolgreich**. [PHP-/SabreDAV-CI #134](https://github.com/lfflr/Taskdate/actions/runs/46109440190) ebenfalls erfolgreich.
+- **Grenzen:** Die erzeugte Fälligkeit bleibt eine iCalendar-Floating-Time ohne `TZID`; die Anzeige und Interpretation in Nextcloud Tasks, Kalender und Drittclients sind noch nicht per UI geprüft. Geteilte Kalender, zusätzliche Client-Zeitzonen, Multi-Client-Synchronisation und tatsächliche Nutzeroberfläche bleiben für die gebündelte Abnahme offen.
+- Code-Stand mit der neuen Dienstanbindung: `f7a2a3839520e2cfc11b636a933b89a449947af8`; getesteter Workflow nach der `occ`-Syntaxkorrektur: `d91396c5cec0b7e73bb7e51e927dd67923bd5b5b`.
+- Keine Migrationen, kein Merge und keine Änderung an produktiven Daten. Kein Tag, ZIP oder signiertes App-Store-Release erstellt.
+
 ## Noch offen / Abnahmekriterien
 
 - **Höchste Priorität:** Ergänzende Nextcloud-35-UI-/Client-Abnahme mit Tasks-Anlage/Bearbeitung, Kalenderdarstellung, geteilten Kalendern und externer Client-Synchronisation. Der automatische CalDAV-Server-Test hat die deklarative Plugineinbindung und den tatsächlichen `method:PUT`-Pfad für direkte HTTP-Clients bestätigt. Jetzt insbesondere prüfen, ob Nextcloud Tasks und externe Clients dieselben fachlichen Ergebnisse liefern.
 - Basis-ACL (Cross-User) und veraltete ETags im echten CalDAV-Test bestanden. Weitere Freigabe-/Teilen-Rechte, Locking und Client-Synchronisation müssen noch abgeprüft werden.
-- Die Berechnung verwendet weiterhin iCalendar-Fließzeit; Benutzerzeitzonen und Sommer-/Winterzeit noch prüfen. Explizit zonierte/UTC-Fälligkeiten und gemischte Kalenderdateien werden jetzt konservativ nicht verändert.
+- Die Berechnung verwendet weiterhin iCalendar-Fließzeit; die **authentifizierte Benutzerzeitzone und DST-Lücke/-Überlappung** sind in NC33–35-Serverintegrationstests nachgewiesen. Die Anzeige in echten Client-Oberflächen sowie die Interpretation von Floating-Time bleibt offen. Explizit zonierte/UTC-Fälligkeiten und gemischte Kalenderdateien werden konservativ nicht verändert.
 - Normale Tasks mit `DTSTART` werden übersprungen; nur nach nachgewiesenem Verhalten erweitern.
 - Lizenzrechtsinhaber/Rechte, Screenshots, App-ID, Zertifikat/Signatur, offizieller App-Store-Eintrag.
 - Vollständige Liste und Schritte: `docs/APPSTORE_RELEASE.md`.

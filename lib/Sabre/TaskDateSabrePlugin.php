@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace OCA\TaskDate\Sabre;
 
 use DateTimeImmutable;
+use DateTimeZone;
+use Closure;
+use OCP\IDateTimeZone;
 use OCA\TaskDate\TaskUpdatePlanner;
 use OCA\TaskDate\TaskWritePolicy;
 use Sabre\DAV\Server;
@@ -20,6 +23,26 @@ use Sabre\VObject\Reader;
 final class TaskDateSabrePlugin extends ServerPlugin {
     private const AUTO_DUE_PROPERTY = 'X-TASKDATE-AUTO-DUE';
     private const MAX_ICAL_BYTES = 1048576;
+
+    /**
+     * An explicit resolver is only needed in isolated SabreDAV tests.
+     * In Nextcloud, use the public user-aware IDateTimeZone service.
+     */
+    public function __construct(private ?Closure $timezoneResolver = null) {
+    }
+
+    private function resolveUserTimeZone(): DateTimeZone {
+        if ($this->timezoneResolver !== null) {
+            $timezone = ($this->timezoneResolver)();
+        } else {
+            $timezone = \OCP\Server::get(IDateTimeZone::class)->getTimeZone();
+        }
+
+        if (!$timezone instanceof DateTimeZone) {
+            throw new \RuntimeException('Could not resolve authenticated user timezone');
+        }
+        return $timezone;
+    }
 
     public function getPluginName(): string {
         return 'taskdate';
@@ -89,7 +112,7 @@ final class TaskDateSabrePlugin extends ServerPlugin {
                 (string)$todo->SUMMARY,
                 $currentDue,
                 $managedDue,
-                new DateTimeImmutable('now')
+                new DateTimeImmutable('now', $this->resolveUserTimeZone())
             );
             if ($plan === null) {
                 return;

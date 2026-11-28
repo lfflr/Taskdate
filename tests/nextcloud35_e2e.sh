@@ -153,6 +153,32 @@ http="$(curl -sS -u "$user:$pass" -o "$temp/no-forbidden" -w '%{http_code}' "$ca
 check "$http" "404"
 echo "PASS: cross-user write access blocked and no task created"
 
+# Check per-user local timezone at spring DST gap / autumn fold.
+for spec in "spring 270328" "fall 271031"; do
+  set -- $spec
+  label="$1"
+  datepart="$2"
+  make_ics "berlin-$label" "Berlin $datepart 0230" ""
+  put "berlin-$label" "$temp/berlin-$label.ics" "put-berlin-$label"
+  fetch "berlin-$label" "berlin-$label-after.ics"
+  grep -Fq "SUMMARY:Berlin $datepart 0230" "$temp/berlin-$label-after.ics"
+  if grep -Eq '^DUE(;|:)' "$temp/berlin-$label-after.ics"; then
+    echo "FAIL: Berlin DST gap/fold was changed" >&2
+    exit 1
+  fi
+  make_ics "utc-$label" "UTC $datepart 0230" ""
+  http="$(curl -sS -u "$other:$other_pass" -X PUT -H 'Content-Type: text/calendar' \
+    --data-binary @"$temp/utc-$label.ics" -o "$temp/put-utc-$label" -w '%{http_code}' \
+    "$other_calendar/utc-$label.ics")"
+  check "$http" "201,204"
+  http="$(curl -sS -u "$other:$other_pass" -o "$temp/utc-$label-after.ics" \
+    -w '%{http_code}' "$other_calendar/utc-$label.ics")"
+  check "$http" "200"
+  grep -Fq "SUMMARY:UTC $datepart" "$temp/utc-$label-after.ics"
+  grep -Fq "DUE:20${datepart}T023000" "$temp/utc-$label-after.ics"
+  echo "PASS: timezone-specific DST $label for Europe/Berlin versus UTC"
+done
+
 # A stale ETag must not overwrite the task.
 http="$(curl -sS -u "$user:$pass" -X PUT -H 'Content-Type: text/calendar' \
   -H 'If-Match: "definitely-stale-etag"' \

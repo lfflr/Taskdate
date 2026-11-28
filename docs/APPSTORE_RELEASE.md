@@ -127,3 +127,6 @@ Offizielle Nextcloud-Dokumentation:
 - https://docs.nextcloud.com/server/stable/developer_manual/app_publishing_maintenance/publishing.html
 
 Zentrale Übergabe und weitere Meilensteine: [HANDOVER.md](HANDOVER.md) und [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md).
+
+
+**Testvorgabe vom 28.11.2026:** Auf ausdrücklichen Wunsch des Projektinhabers werden **keine neuen Tests auf Nextcloud 35** ausgeführt. Neue automatische Integrationstests ausschließlich auf **Nextcloud 33 und 34**. Frühere NC35-Ergebnisse bleiben historische Nachweise, aber keine Aufforderung zur erneuten Prüfung. Die Angabe unterstützter Versionen und die spätere Veröffentlichung sind davon getrennte Entscheidungen.

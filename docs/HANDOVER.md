@@ -1,6 +1,6 @@
 # HANDOVER – TaskDate
 
-**Aktualisiert:** 2026-11-27  
+**Aktualisiert:** 2026-11-28  
 **Repository:** https://github.com/lfflr/Taskdate  
 **Main-Ausgangspunkt des Arbeitspakets:** `d4e9a2509e08752f02e92d21e647b9b0bedbc235` (0.2.2).  
 **Entwicklungsbranch:** `release/appstore-readiness-2026-11-26`  
@@ -82,6 +82,15 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 - **Keine Migrationen**, keine produktiven Daten verändert, kein Merge, Tag oder Release. Neues Code-Testcommit: `12c6bc520e7f290b1eab9946e8c90f95124fe1ed`.
 
 **Wichtig:** Die Zeitzonen-Regressionen prüfen das **bewusste Nicht-Umschreiben** explizit zonierter oder gemischter Dateien. Sie bestätigen noch keine korrekte lokale Sommer-/Winterzeitumrechnung für alle Clients. Die aktuelle floating-time-Semantik und die Ermittlung der Benutzerzeitzone sind vor der Freigabe weiterhin fachlich zu prüfen.
+
+## Aktuelles Integrationstestpaket (2026-11-28)
+
+- Neu in `tests/nextcloud35_e2e.sh`: echte HTTP-`PUT`-/`GET`-Runden für fremde Aufgaben mit `DUE:...Z` (UTC), `DUE;TZID=Europe/Berlin` und Aufgabentexte in `DESCRIPTION`. UTC-/TZID-Termine müssen inhaltlich unverändert bleiben; bei einer regulären TaskDate-Transformation müssen zusätzliche `VTODO`-Felder erhalten bleiben.
+- **Nachweis:** [Nextcloud-33–35-Matrix #31](https://github.com/lfflr/Taskdate/actions/runs/46104699628) vollständig erfolgreich (NC33, NC34, NC35). [PHP-/SabreDAV-Prüfung #117](https://github.com/lfflr/Taskdate/actions/runs/46104699641) erfolgreich.
+- Geprüfter Code-Commit: `8856a39de72388ec016c760f64755f7551b4b17a`.
+- `docs/DEVELOPMENT_PLAN.md` und `docs/APPSTORE_RELEASE.md` entsprechend aktualisiert.
+- **Testgrenze:** Keine Browser-Abnahme der Nextcloud-Tasks-App, kein externer CalDAV-Client, keine geteilten Kalender oder bestätigte lokale DST-Konvertierung. Explizit zonierte Termine werden aus Sicherheitsgründen von TaskDate nicht verändert.
+- Keine Migrationen, keine produktiven Nutzerdaten verändert, kein Merge, Tag, App-Store-Eintrag oder Release.
 
 ## Noch offen / Abnahmekriterien
 

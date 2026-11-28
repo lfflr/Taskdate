@@ -39,6 +39,12 @@
 - C3: `heute`/`morgen` kurz vor und nach Mitternacht in der Benutzerzeitzone gegen Serverzeitzone prüfen.
 - C4: Beim Wechsel zwischen Browser- und Client-Zeitzone darf eine explizit zonierte bestehende Fälligkeit nicht stillschweigend ersetzt werden.
 
+## Ergänzung – relative Angaben
+
+- D1: `heute`/`morgen` nahe der lokalen Mitternacht erstellen und sicherstellen, dass das Datum aus der Benutzerzeitzone stammt.
+- D2: Eine automatisch verwaltete Aufgabe mit `morgen` am Folgetag erneut öffnen und speichern; die ursprünglich gesetzte Fälligkeit darf dadurch nicht unbemerkt um einen weiteren Tag wandern.
+- D3: Wenn statt `morgen` ausdrücklich ein anderes relatives Wort eingegeben wird, dokumentieren, dass TaskDate bei bereits verwalteten relativen Titeln vorerst nicht neu berechnet; die Fälligkeit kann manuell angepasst werden.
+
 ## Ergebnisprotokoll
 
 Für jede fehlgeschlagene Prüfung notieren: Test-ID, Nextcloud-/Tasks-Version, Originaltitel, erwartete und tatsächliche DUE/SUMMARY, Zeitpunkt, Zeitzone, Browser/Client, Logauszug **ohne personenbezogene Daten oder Zugangsdaten** und gegebenenfalls Screenshot.

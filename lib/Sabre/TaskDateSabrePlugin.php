@@ -35,7 +35,12 @@ final class TaskDateSabrePlugin extends ServerPlugin {
         if ($this->timezoneResolver !== null) {
             $timezone = ($this->timezoneResolver)();
         } else {
-            $timezone = \OCP\Server::get(IDateTimeZone::class)->getTimeZone();
+            $user = \OCP\Server::get(\OCP\IUserSession::class)->getUser();
+            if ($user === null) {
+                throw new \RuntimeException('No authenticated CalDAV user');
+            }
+            $timezone = \OCP\Server::get(IDateTimeZone::class)
+                ->getTimeZone(false, $user->getUID());
         }
 
         if (!$timezone instanceof DateTimeZone) {

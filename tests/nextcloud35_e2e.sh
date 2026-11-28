@@ -94,6 +94,25 @@ if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/recurring-after.ics"; then
 fi
 echo "PASS: RRULE task remains unchanged"
 
+# Completed and cancelled tasks remain unchanged by TaskDate even if their
+# titles contain parseable dates. These are real NC35 CalDAV round trips.
+for status in COMPLETED CANCELLED IN-PROCESS; do
+  case "$status" in
+    COMPLETED) filename="completed-status" ;;
+    CANCELLED) filename="cancelled-status" ;;
+    *) filename="in-process-status" ;;
+  esac
+  make_ics "$filename" "Fertig 261112 1530" "STATUS:$status"
+  put "$filename" "$temp/$filename.ics" "put-$filename"
+  fetch "$filename" "$filename-after.ics"
+  grep -Fq 'SUMMARY:Fertig 261112 1530' "$temp/$filename-after.ics"
+  if grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/$filename-after.ics"; then
+    echo "FAIL: status $status unexpectedly auto-managed" >&2
+    exit 1
+  fi
+  echo "PASS: $status VTODO unchanged"
+done
+
 # Third-party clients can carry explicitly zoned DUE properties. Preserve
 # them and do not turn UTC or TZID data into floating time.
 make_ics "utc" "UTC Termin 261112 1530" "DUE:20261112T120000Z"

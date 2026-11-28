@@ -37,6 +37,8 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 - [ ] Festgestellte Probleme im gleichen Entwicklungspaket lösen und relevante Tests ergänzen.
 - [x] Deklarierte Nextcloud 33–35-Versionen für direkte CalDAV-HTTP-Integration auf jeweils frischen Docker-Testinstallationen verifiziert. UI- und Drittclient-Abnahme getrennt offen.
 
+- [ ] Zusätzliche Regressionen für `heute`/`morgen` über lokale Mitternacht (UTC, Europe/Berlin, America/New_York) und Stabilität wiederholter `PUT`-Vorgänge mit relativen Terminen; Code implementiert, CI-Ergebnis wird geprüft. Bereits verwaltete relative Wörter/Wochentage werden konservativ nicht bei jedem erneuten Speichern neu ausgewertet.
+
 ## P3: App-Store-Release – gebündelt nach Abnahme
 
 - [ ] Quellcode-Rechte prüfen, Icon/Screenshots finalisieren, erforderliche Metadaten vervollständigen.

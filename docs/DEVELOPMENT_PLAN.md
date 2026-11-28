@@ -37,7 +37,7 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 - [ ] Festgestellte Probleme im gleichen Entwicklungspaket lösen und relevante Tests ergänzen.
 - [x] Deklarierte Nextcloud 33–35-Versionen für direkte CalDAV-HTTP-Integration auf jeweils frischen Docker-Testinstallationen verifiziert. UI- und Drittclient-Abnahme getrennt offen.
 
-- [ ] Zusätzliche Regressionen für `heute`/`morgen` über lokale Mitternacht (UTC, Europe/Berlin, America/New_York) und Stabilität wiederholter `PUT`-Vorgänge mit relativen Terminen; Code implementiert, CI-Ergebnis wird geprüft. Bereits verwaltete relative Wörter/Wochentage werden konservativ nicht bei jedem erneuten Speichern neu ausgewertet.
+- [x] Relative Datumsangaben über Benutzer-Mitternacht (UTC, Europe/Berlin, America/New_York) sowie der Schutz gegen späteres ungewolltes Verschieben bereits verwalteter `heute`-/`morgen`-/Wochentags-Aufgaben sind durch Planner-Regressionen [PHP-CI #148](https://github.com/lfflr/Taskdate/actions/runs/46109844565) bestanden. Der zusätzliche reale CalDAV-Repeat-PUT-Test ist in der [NC33–35-Matrix #59](https://github.com/lfflr/Taskdate/actions/runs/46109799134) auf allen drei Versionen erfolgreich.
 
 ## P3: App-Store-Release – gebündelt nach Abnahme
 

@@ -61,6 +61,8 @@ Nachweise:
 
 **Neuer Live-Nachweis (28.11.2026):** [CI-Matrix #31](https://github.com/lfflr/Taskdate/actions/runs/46104699628) erfolgreich auf Nextcloud 33, 34 und 35. Ergänzende direkte CalDAV-`PUT`/`GET`-Tests prüfen jetzt auf allen drei Versionen UTC-`DUE`, `DUE;TZID=Europe/Berlin` sowie das Beibehalten von `DESCRIPTION` bei der automatischen Titelanpassung. [PHP-/SabreDAV-Lauf #117](https://github.com/lfflr/Taskdate/actions/runs/46104699641) ebenfalls erfolgreich. Das ist ein Test des unveränderten Durchreichens zonierter Aufgaben, keine vollständige Zeitzonen-/DST-Implementierung. Ein externer Client und die Tasks-Weboberfläche sind weiterhin offen.
 
+**Sommerzeit-Regressionsschutz (28.11.2026):** Die Parser- und Planner-Logik vermeidet jetzt automatische Änderungen bei einer nicht existierenden oder doppelt vorkommenden lokalen Uhrzeit in der jeweils übergebenen Zeitzone. Testfälle für `Europe/Berlin` (28.03. und 31.10.2027) sowie eine UTC-Kontrolle sind in [PHP-CI #125](https://github.com/lfflr/Taskdate/actions/runs/46106043899) bestanden. **Das ist keine vollständige Benutzerzeitzonen-Unterstützung:** Der SabreDAV-Aufruf arbeitet weiterhin mit der serverseitigen PHP-Zeitzone; individuelle Benutzerzeitzonen sind noch nicht nachgewiesen.
+
 ## 4. Gebündelte ergänzende Praxistests – Freigabegruppe A
 
 Die serverseitigen Standardfälle sind mit der isolierten Docker-Instanz bereits getestet. Für die verbleibende **UI-/Client-Abnahme** gemäß [UI_CLIENT_ACCEPTANCE.md](UI_CLIENT_ACCEPTANCE.md) nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:

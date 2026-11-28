@@ -33,7 +33,7 @@ final class TaskUpdatePlanner {
         // Relative dates must not drift whenever a client later resaves
         // an already managed task. Without an original absolute anchor,
         // the original relative reference date cannot be safely reconstructed.
-        if ($managed && preg_match('/(?<![\\pL])(heute|morgen|übermorgen|uebermorgen|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonnabend|sonntag)(?![\\pL])/iu', $summary) === 1) {
+        if ($managed && preg_match('/(?<![\p{L}])(heute|morgen|übermorgen|uebermorgen|montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonnabend|sonntag)(?![\p{L}])/iu', $summary) === 1) {
             return null;
         }
 

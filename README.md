@@ -29,6 +29,8 @@ Die Nextcloud-DAV-Integration erfolgt deklarativ über `appinfo/info.xml` (`type
 
 **Noch zu prüfen:** Zeitzonen und Sommerzeit, tatsächliche Nextcloud-35-Aufgabenflüsse (einschließlich Nextcloud Tasks), Starts und Wiederholungen, unterschiedliche Benutzerrechte, lesegeschützte Kalender sowie Verhalten anderer Clients. Zeitangaben ohne explizite Zone werden derzeit als iCalendar-Fließzeit gespeichert.
 
+**Relative Datumsangaben:** Bei der erstmaligen Übernahme von `heute`, `morgen`, `übermorgen` oder Wochentagen zählt das lokale Datum des angemeldeten Benutzers. Wird eine bereits automatisch verwaltete Aufgabe später erneut gespeichert, bleibt ihre Fälligkeit stabil und wird nicht täglich neu berechnet. Für eine bewusste Änderung des relativen Datums muss die Fälligkeit vorerst manuell angepasst werden. Die Server- und Planner-Regressionen sind in GitHub Actions dokumentiert.
+
 ## Entwicklung und Tests
 
 ```sh

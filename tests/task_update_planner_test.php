@@ -26,6 +26,12 @@ $cases = [
     ['Termin 271031', '20271030T023000', '20271030T023000', null], // DST overlap if time retained
     ['Termin 270328', '20270327T013000', '20270327T013000', ['due' => '20270328T013000', 'summary' => 'Termin 270328']],
     ['Termin 271031', '20271030T033000', '20271030T033000', ['due' => '20271031T033000', 'summary' => 'Termin 271031']],
+    ['Erinnerung morgen', '20261111T140500', '20261111T140500', null], // no rolling resave
+    ['Erinnerung heute', '20261110T140500', '20261110T140500', null],
+    ['Erinnerung Montag', '20261116T140500', '20261116T140500', null],
+    ['Erinnerung übermorgen', '20261112T140500', '20261112T140500', null],
+    ['Erinnerung morgens', '20261112T140500', '20261112T140500', ['due' => null, 'summary' => 'Erinnerung morgens']], // no false match
+
 ];
 foreach ($cases as $i => [$summary, $due, $managedDue, $expected]) {
     $actual = TaskUpdatePlanner::plan($summary, $due, $managedDue, $now);

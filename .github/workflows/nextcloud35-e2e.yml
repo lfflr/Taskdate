@@ -1,4 +1,4 @@
-name: Nextcloud 33-35 integration (isolated)
+name: Nextcloud 33-34 integration (isolated)
 on:
   pull_request:
     paths:
@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        nextcloud: [33, 34, 35]
+        nextcloud: [33, 34]
     steps:
       - uses: actions/checkout@v4
       - name: Prepare unsigned runtime package

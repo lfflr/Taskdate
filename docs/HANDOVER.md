@@ -152,6 +152,6 @@ Gemäß `docs/DEVELOPMENT_PLAN.md` ist **P2 mit direktem CalDAV-Serververkehr au
 ## NC35-CalDAV-Freigabeprüfung (28.11.2026)
 
 - Ergänzt in `tests/nextcloud35_e2e.sh`: echte freigegebene Kalender über das CalDAV-Share-Protokoll, zunächst lesend und ohne Schreibrecht, danach mit Les-/Schreibrecht; plus Lebenszyklus einer automatisch verwalteten Aufgabe von `NEEDS-ACTION` zu `COMPLETED` und `CANCELLED`.
-- Vorläufiger Prüfstand: **CI noch auszuwerten**, [NC35-Integration #86](https://github.com/lfflr/Taskdate/actions/runs/46153792979); keine Behauptung einer erfolgreichen Freigabe-Abnahme vor dem Testergebnis.
+- **Erfolgreich geprüft:** [NC35-Integration #86](https://github.com/lfflr/Taskdate/actions/runs/46153792979), einschließlich read-only Freigabe (abgewiesener Schreibzugriff), Upgrade auf read-write (Empfänger erstellt korrekt von TaskDate umgewandelte Aufgabe) und abgeschlossener/abgebrochener VTODO-Lebenszyklus. [PHP-/SabreDAV-Prüflauf #172](https://github.com/lfflr/Taskdate/actions/runs/46153792977) ebenfalls erfolgreich. Dieser Test umfasst keine vollständige grafische Nextcloud-Tasks-/Kalender-Abnahme.
 - Ausschließlich Nextcloud 35; keine neuen Tests auf Nextcloud 33 oder 34; keine Freigabe von NC36.
 - Keine produktiven Daten oder Migrationen; `main`, PR-Draft und Veröffentlichung unverändert.

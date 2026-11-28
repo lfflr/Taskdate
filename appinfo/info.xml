@@ -21,6 +21,6 @@
     <website>https://github.com/lfflr/Taskdate</website>
     <bugs>https://github.com/lfflr/Taskdate/issues</bugs>
     <dependencies>
-        <nextcloud min-version="33" max-version="35"/>
+        <nextcloud min-version="35" max-version="35"/>
     </dependencies>
 </info>

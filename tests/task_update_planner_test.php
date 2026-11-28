@@ -33,4 +33,23 @@ foreach ($cases as $i => [$summary, $due, $managedDue, $expected]) {
         throw new RuntimeException("Planner case $i failed: " . var_export($actual, true));
     }
 }
-echo 'TaskUpdatePlanner: ' . count($cases) . " cases passed\n";
+
+// Same instant in UTC and Europe/Berlin must produce a different civil day.
+// This simulates two authenticated users close to local midnight.
+$instant = new DateTimeImmutable('2026-11-28T23:30:00+00:00');
+$relativeCases = [
+    ['UTC', 'Erinnerung heute 1405', '20261128T140500'],
+    ['Europe/Berlin', 'Erinnerung heute 1405', '20261129T140500'],
+    ['UTC', 'Erinnerung morgen 1405', '20261129T140500'],
+    ['Europe/Berlin', 'Erinnerung morgen 1405', '20261130T140500'],
+    ['America/New_York', 'Erinnerung heute 1405', '20261128T140500'],
+];
+foreach ($relativeCases as [$timezone, $summary, $expectedDue]) {
+    $nowForUser = $instant->setTimezone(new DateTimeZone($timezone));
+    $planned = TaskUpdatePlanner::plan($summary, null, null, $nowForUser);
+    if ($planned === null || $planned['due'] !== $expectedDue) {
+        throw new RuntimeException('Wrong user-local civil day for ' . $timezone . ': ' . var_export($planned, true));
+    }
+}
+
+echo 'TaskUpdatePlanner: ' . count($cases) . ' scenarios plus ' . count($relativeCases) . " user-local midnight cases passed\n";

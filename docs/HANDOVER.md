@@ -98,7 +98,7 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 - `lib/TaskUpdatePlanner.php` übernimmt eine bereits automatisch verwaltete Uhrzeit nur dann auf ein geändertes Datum, wenn diese Uhrzeit dort gültig und eindeutig ist.
 - `tests/date_parser_test.php` prüft sieben DST-Grenzfälle (Europe/Berlin 28.03.2027 und 31.10.2027 plus UTC-Kontrolle), `tests/task_update_planner_test.php` vier zusätzliche Fälle für bestehende Zeitwerte.
 - [PHP-/Parser-/Planner-CI #125](https://github.com/lfflr/Taskdate/actions/runs/46106043899) **erfolgreich**; [vollständige Docker-CalDAV-Matrix #39](https://github.com/lfflr/Taskdate/actions/runs/46106043915) **NC33, NC34 und NC35 je erfolgreich**.
-- **Einschränkung:** Die Prüfung verwendet die dem Parser übergebene Zeitzone. Im DAV-Pfad wird die PHP-Serverzeitzone verwendet; die Benutzerzeitzone ist noch nicht zuverlässig angebunden. Eine umfassende DST-/Browser-/externe-Client-Freigabe ist deshalb weiterhin offen.
+- **Historischer Stand vor dem Benutzerzeitzonen-Block:** Die Prüfung nutzte damals die PHP-Serverzeitzone. **Inzwischen behoben und per NC33–35-Docker-Matrix #48 nachgewiesen:** Der DAV-Pfad nutzt die authentifizierte Benutzerzeitzone. Die UI-/Drittclient-DST-Abnahme bleibt offen.
 - Implementierter Code-Stand: `8bc192de288cd44d8f1bc794636132f46ec6f3f7`.
 - Keine Migrationen, kein Merge, kein Release, keine produktiven Daten berührt.
 

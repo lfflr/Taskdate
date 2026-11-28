@@ -205,6 +205,60 @@ http="$(curl -sS -u "$user:$pass" -o "$temp/no-forbidden" -w '%{http_code}' "$ca
 check "$http" "404"
 echo "PASS: cross-user write access blocked and no task created"
 
+# Owner shares the test calendar with the second user. Verify read-only
+# prevents writes; then upgrade the share to read-write and verify TaskDate
+# transforms a VTODO created by the recipient. All paths are disposable.
+shared_calendar="$base/remote.php/dav/calendars/$other/taskdate-e2e_shared_by_$user"
+cat > "$temp/share-read.xml" <<'XML'
+<o:share xmlns:o="http://owncloud.org/ns" xmlns:d="DAV:">
+  <o:set>
+    <d:href>principal:principals/users/taskdateuser</d:href>
+    <o:read/>
+  </o:set>
+</o:share>
+XML
+http="$(curl -sS -u "$user:$pass" -X POST -H 'Content-Type: application/xml' \
+  --data-binary @"$temp/share-read.xml" -o "$temp/share-read-response" \
+  -w '%{http_code}' "$calendar/")"
+check "$http" "200,201,204"
+
+# Shared calendar should be visible to the recipient via the shared URI.
+http="$(curl -sS -u "$other:$other_pass" -o "$temp/shared-read.ics" \
+  -w '%{http_code}' "$shared_calendar/auto.ics")"
+check "$http" "200"
+grep -Fq 'DUE:' "$temp/shared-read.ics"
+make_ics "shared-denied" "Geteilt 261112 1405" ""
+http="$(curl -sS -u "$other:$other_pass" -X PUT -H 'Content-Type: text/calendar' \
+  --data-binary @"$temp/shared-denied.ics" -o "$temp/shared-denied-result" \
+  -w '%{http_code}' "$shared_calendar/shared-denied.ics")"
+check "$http" "403,404"
+http="$(curl -sS -u "$user:$pass" -o "$temp/owner-shared-denied" \
+  -w '%{http_code}' "$calendar/shared-denied.ics")"
+check "$http" "404"
+echo "PASS: read-only calendar share denies recipient write"
+
+cat > "$temp/share-write.xml" <<'XML'
+<o:share xmlns:o="http://owncloud.org/ns" xmlns:d="DAV:">
+  <o:set>
+    <d:href>principal:principals/users/taskdateuser</d:href>
+    <o:read-write/>
+  </o:set>
+</o:share>
+XML
+http="$(curl -sS -u "$user:$pass" -X POST -H 'Content-Type: application/xml' \
+  --data-binary @"$temp/share-write.xml" -o "$temp/share-write-response" \
+  -w '%{http_code}' "$calendar/")"
+check "$http" "200,201,204"
+make_ics "shared-write" "Freigabe 261112 1537" ""
+http="$(curl -sS -u "$other:$other_pass" -X PUT -H 'Content-Type: text/calendar' \
+  --data-binary @"$temp/shared-write.ics" -o "$temp/shared-write-result" \
+  -w '%{http_code}' "$shared_calendar/shared-write.ics")"
+check "$http" "201,204"
+fetch "shared-write" "owner-shared-write.ics"
+grep -Fq 'SUMMARY:Freigabe 261112' "$temp/owner-shared-write.ics"
+grep -Fq 'DUE:20261112T153700' "$temp/owner-shared-write.ics"
+echo "PASS: read-write calendar share permits recipient TaskDate PUT"
+
 # Check per-user local timezone at spring DST gap / autumn fold.
 for spec in "spring 270328" "fall 271031"; do
   set -- $spec

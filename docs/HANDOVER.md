@@ -119,6 +119,7 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 - `tests/task_update_planner_test.php`: fünf neue Randfälle für lokale Tagesgrenzen in `UTC`, `Europe/Berlin` und `America/New_York`; zusätzliche Fälle für spätere erneute Speicherung und Abgrenzung ähnlich klingender Wörter.
 - `tests/nextcloud35_e2e.sh`: echtes erneutes PUT/GET einer Aufgabe mit `morgen` und Vergleich der gespeicherten DUE vor/nach der Wiederholung.
 - Tatsächlich bestanden: [PHP-/SabreDAV-Testlauf #148](https://github.com/lfflr/Taskdate/actions/runs/46109844565) und [Nextcloud 33–35-Matrix #59](https://github.com/lfflr/Taskdate/actions/runs/46109799134) mit **3/3 erfolgreichen Versionen**.
+- Abschließender zusätzlicher [Nextcloud 33–35-Matrixlauf #62](https://github.com/lfflr/Taskdate/actions/runs/46109844524) nach den später ergänzten Planner-Testfällen ebenfalls mit **3/3 erfolgreich**. Reine Dokumentationsänderungen danach lösen keinen erneuten Testlauf aus.
 - Dokumentation in `README.md`, `docs/DEVELOPMENT_PLAN.md`, `docs/APPSTORE_RELEASE.md`, `docs/UI_CLIENT_ACCEPTANCE.md` aktualisiert.
 - Geprüfter Integrationscode: `ebe43ed90f8812f4130f5557fce13f587b53f8f4`; danach wurde der separate Planner-Test um spätere Wiederholungen erweitert (Commit `63726c5c892235dd5ff3b98878b8ab6277fa0555`), PHP-CI ebenfalls erfolgreich.
 - Keine Datenbankmigrationen, keine Berührung produktiver Daten, kein Merge und kein öffentliches Release.

@@ -46,6 +46,33 @@ foreach ($cases as $title => $expected) {
     }
 }
 
+// Explicit DST regression tests: never silently shift or guess local times.
+$berlin = new DateTimeZone('Europe/Berlin');
+$dstCases = [
+    ['Termin 270328 0130', '2027-03-28 01:30', true],
+    ['Termin 270328 0230', null, false], // spring-forward missing hour
+    ['Termin 270328 0330', '2027-03-28 03:30', true],
+    ['Termin 271031 0130', '2027-10-31 01:30', true],
+    ['Termin 271031 0230', null, false], // fall-back repeated hour
+    ['Termin 271031 0330', '2027-10-31 03:30', true],
+    ['Termin 270328 0230', '2027-03-28 02:30', true, new DateTimeZone('UTC')],
+];
+foreach ($dstCases as $index => $case) {
+    [$title, $expectedDate, $expectedHasTime] = $case;
+    $timezone = $case[3] ?? $berlin;
+    $reference = new DateTimeImmutable('2027-01-01 12:00:00', $timezone);
+    $parsed = DateParser::parse($title, $reference);
+    if ($expectedDate === null) {
+        if ($parsed !== null) {
+            throw new RuntimeException('Ambiguous/nonexistent time accepted: ' . $title);
+        }
+    } elseif ($parsed === null
+        || $parsed[0]->format('Y-m-d H:i') !== $expectedDate
+        || $parsed[1] !== $expectedHasTime) {
+        throw new RuntimeException('DST boundary rejected or shifted: ' . $title);
+    }
+}
+
 $cleanupCases = [
     'Zahnarzt 261112 1530' => 'Zahnarzt 261112',
     'Zahnarzt 261112 1537' => 'Zahnarzt 261112',
@@ -65,4 +92,4 @@ foreach ($cleanupCases as $original => $expectedTitle) {
     }
 }
 
-echo 'DateParser: ' . count($cases) . ' parse cases and ' . count($cleanupCases) . " cleanup cases passed\n";
+echo 'DateParser: ' . count($cases) . ' parse cases, ' . count($dstCases) . ' DST cases and ' . count($cleanupCases) . " cleanup cases passed\n";

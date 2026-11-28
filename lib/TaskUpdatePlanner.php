@@ -41,11 +41,16 @@ final class TaskUpdatePlanner {
         [$date, $hasTime] = $parsed;
         if (!$hasTime && $managed && $managedDue !== null
             && preg_match('/^\d{8}T\d{6}$/', $managedDue) === 1) {
-            $date = $date->setTime(
-                (int)substr($managedDue, 9, 2),
-                (int)substr($managedDue, 11, 2),
-                (int)substr($managedDue, 13, 2)
-            );
+            $h = (int)substr($managedDue, 9, 2);
+            $m = (int)substr($managedDue, 11, 2);
+            $seconds = (int)substr($managedDue, 13, 2);
+            if ($h > 23 || $m > 59 || $seconds > 59
+                || !DateParser::isSafeLocalTime($date, $h, $m)) {
+                // Never normalize a retained time into a different or
+                // ambiguous wall-clock hour after changing the date.
+                return null;
+            }
+            $date = $date->setTime($h, $m, $seconds);
             $hasTime = true;
         }
 

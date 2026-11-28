@@ -89,7 +89,7 @@ class DateParser {
             $h = (int)$t[1];
             $min = isset($t[2]) && $t[2] !== '' ? (int)$t[2] : 0;
             if ($h < 24 && $min < 60) {
-                if (!self::safeLocalTime($date, $h, $min)) {
+                if (!self::isSafeLocalTime($date, $h, $min)) {
                     // A missing or doubled wall-clock hour is not a unique due time.
                     return null;
                 }
@@ -106,7 +106,7 @@ class DateParser {
      * Otherwise PHP silently normalizes missing hours or chooses one
      * of two possible instants. Fixed-offset zones have no such transitions.
      */
-    private static function safeLocalTime(DateTimeImmutable $day, int $hour, int $minute): bool {
+    public static function isSafeLocalTime(DateTimeImmutable $day, int $hour, int $minute): bool {
         $candidate = $day->setTime($hour, $minute);
         if ((int)$candidate->format('G') !== $hour
             || (int)$candidate->format('i') !== $minute

@@ -29,7 +29,8 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 - [ ] DTSTART bei normalen Tasks prüfen; vorerst vorsichtshalber ausgenommen.
 - [x] Wiederholungsaufgabe mit RRULE wird von TaskDate nicht verändert; ganztägige DUE-Termine funktionieren in der direkten CalDAV-Teststrecke.
 - [x] Schutz für UTC-/TZID-Fälligkeiten, VTIMEZONE und mehrfach vorhandene Kalenderkomponenten implementiert; fünf SabreDAV-Regressionstests hinzugefügt.
-- [ ] Sommer-/Winterzeit und unterschiedliche Benutzer-/Client-Zeitzonen vollständig prüfen; explizit zonierte oder gemischte Kalenderdokumente bleiben vorerst unverändert.
+- [x] Parser- und Planner-Regressionen für DST-Lücken und doppelte Ortszeiten in `Europe/Berlin` implementiert und in [PHP-CI #125](https://github.com/lfflr/Taskdate/actions/runs/46106043899) erfolgreich geprüft.
+- [ ] Individuelle Benutzer-/Client-Zeitzonen korrekt aus Nextcloud übernehmen und vollständige UI- und DST-Abnahme durchführen; explizit zonierte Kalenderdokumente bleiben vorerst unverändert.
 - [x] Live-CalDAV-Tests für UTC-DUE, TZID-DUE und Erhaltung der VTODO-Beschreibung auf NC33–35 abgeschlossen: [Matrix #31](https://github.com/lfflr/Taskdate/actions/runs/46104699628) 3/3 erfolgreich. [PHP/SabreDAV #117](https://github.com/lfflr/Taskdate/actions/runs/46104699641) ebenfalls erfolgreich.
 - [x] CalDAV-HTTP-Roundtrips für automatische DUE, Titelbereinigung, Datumsänderung mit Uhrzeiterhalt, manuelle DUE und DUE-Löschung, ganztägige DUE, DTSTART-Ausnahme und unberechtigte PUTs geprüft.
 - [ ] Sichtprüfung in Nextcloud Tasks und Kalender einschließlich Client-Synchronisation durchführen.

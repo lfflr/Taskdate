@@ -101,6 +101,13 @@ $unchanged = [
     taskIcs('Zahnarzt 261112 1530', '20261112T090000'), // manual DUE
     taskIcs('Zahnarzt 261112 1530', null, null, 'DTSTART:20261112T090000'),
     taskIcs('Zahnarzt 261112 1530', null, null, 'RRULE:FREQ=DAILY'),
+    taskIcs('Ausnahme 261112 1530', null, null, 'EXDATE:20261113T153000'),
+    taskIcs('Zusatztermin 261112 1530', null, null, 'RDATE:20261114T153000'),
+    taskIcs('Dauer 261112 1530', null, null, 'DURATION:PT1H'),
+    taskIcs('Erledigt 261112 1530', null, null, 'STATUS:COMPLETED'),
+    taskIcs('Erledigt mit Zeit 261112 1530', null, null, 'COMPLETED:20261112T154000Z'),
+    taskIcs('Abgesagt 261112 1530', null, null, 'STATUS:CANCELLED'),
+    taskIcs('In Bearbeitung 261112 1530', null, null, 'STATUS:IN-PROCESS'),
 ];
 foreach ($unchanged as $i => $before) {
     [$after] = runPut($before);
@@ -193,6 +200,6 @@ foreach ($foreign as $i => $ics) {
         throw new RuntimeException("External timezone/multicomponent case $i was changed");
     }
 }
-echo "TaskDate SabreDAV request tests: 5 rewrites, 5 exclusions, 4 stream cases, 5 foreign ICS cases passed\n";
+echo "TaskDate SabreDAV request tests: 5 rewrites, 12 exclusions, 4 stream cases, 5 foreign ICS cases passed\n";
 
 

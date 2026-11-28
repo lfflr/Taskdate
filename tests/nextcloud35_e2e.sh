@@ -113,6 +113,39 @@ for status in COMPLETED CANCELLED IN-PROCESS; do
   echo "PASS: $status VTODO unchanged"
 done
 
+# A normal actionable task is transformed, but subsequent completion
+# must preserve its managed DUE, marker and all other properties.
+make_ics "lifecycle" "Aktion 261112 1405" "STATUS:NEEDS-ACTION"
+put "lifecycle" "$temp/lifecycle.ics" "put-lifecycle"
+fetch "lifecycle" "lifecycle-created.ics"
+grep -Fq 'STATUS:NEEDS-ACTION' "$temp/lifecycle-created.ics"
+grep -Fq 'SUMMARY:Aktion 261112' "$temp/lifecycle-created.ics"
+grep -Fq 'DUE:20261112T140500' "$temp/lifecycle-created.ics"
+grep -Fq 'X-TASKDATE-AUTO-DUE:20261112T140500' "$temp/lifecycle-created.ics"
+echo "PASS: NEEDS-ACTION is auto-managed"
+
+sed -e 's/STATUS:NEEDS-ACTION/STATUS:COMPLETED/' \
+    -e 's/SUMMARY:Aktion 261112/SUMMARY:Aktion 261113/' \
+    "$temp/lifecycle-created.ics" > "$temp/lifecycle-completed.ics"
+put "lifecycle" "$temp/lifecycle-completed.ics" "put-lifecycle-completed"
+fetch "lifecycle" "lifecycle-after.ics"
+grep -Fq 'STATUS:COMPLETED' "$temp/lifecycle-after.ics"
+grep -Fq 'SUMMARY:Aktion 261113' "$temp/lifecycle-after.ics"
+grep -Fq 'DUE:20261112T140500' "$temp/lifecycle-after.ics"
+grep -Fq 'X-TASKDATE-AUTO-DUE:20261112T140500' "$temp/lifecycle-after.ics"
+echo "PASS: completed task retains original due and user-edited summary"
+
+# A previously managed task marked cancelled must also retain its due.
+sed -e 's/STATUS:COMPLETED/STATUS:CANCELLED/' \
+    -e 's/SUMMARY:Aktion 261113/SUMMARY:Aktion 261114/' \
+    "$temp/lifecycle-after.ics" > "$temp/lifecycle-cancelled.ics"
+put "lifecycle" "$temp/lifecycle-cancelled.ics" "put-lifecycle-cancelled"
+fetch "lifecycle" "lifecycle-cancelled-after.ics"
+grep -Fq 'STATUS:CANCELLED' "$temp/lifecycle-cancelled-after.ics"
+grep -Fq 'SUMMARY:Aktion 261114' "$temp/lifecycle-cancelled-after.ics"
+grep -Fq 'DUE:20261112T140500' "$temp/lifecycle-cancelled-after.ics"
+echo "PASS: cancelled task retains existing due"
+
 # Third-party clients can carry explicitly zoned DUE properties. Preserve
 # them and do not turn UTC or TZID data into floating time.
 make_ics "utc" "UTC Termin 261112 1530" "DUE:20261112T120000Z"

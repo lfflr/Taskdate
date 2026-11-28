@@ -2,7 +2,7 @@
 
 TaskDate erkennt Datums- und Uhrzeitangaben in Nextcloud-Aufgabentiteln (VTODO) und setzt automatisch das Fälligkeitsdatum. Bei einer erkannten Uhrzeit wird diese aus dem Titel entfernt. Es entsteht **kein zusätzlicher Kalendereintrag**: Die bestehende Aufgabe kann mit aktivierter Aufgabenanzeige im Kalender erscheinen.
 
-**Status:** 0.2.3 ist ein Entwicklungskandidat in [PR #1](https://github.com/lfflr/Taskdate/pull/1). Kein freigegebenes App-Store-Release. Nextcloud 33–35 ist deklariert; direkte CalDAV-Integrationstests auf Nextcloud 33, 34 und 35 wurden erfolgreich durchgeführt. Nextcloud Tasks als Benutzeroberfläche, externe Clients, geteilte Kalender und Zeitzonen sind noch nicht vollständig abgenommen.
+**Status:** 0.2.3 ist ein Entwicklungskandidat in [PR #1](https://github.com/lfflr/Taskdate/pull/1). Kein freigegebenes App-Store-Release. **Mindestversion: Nextcloud 35.** Die aktuelle Freigabespanne ist vorsichtshalber auf NC35 begrenzt; NC36+ bedarf gesonderter Prüfung. Frühere erfolgreiche NC33/34-Tests bleiben historische Nachweise, sind aber nicht mehr Teil der unterstützten Zielversionen oder neuer CI-Läufe. Nextcloud Tasks als Benutzeroberfläche, externe Clients, geteilte Kalender und Zeitzonen sind noch nicht vollständig abgenommen.
 
 ## Beispiele
 

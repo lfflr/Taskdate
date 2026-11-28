@@ -136,3 +136,6 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 ## Nächste gebündelte Phase
 
 Gemäß `docs/DEVELOPMENT_PLAN.md` ist **P2 mit direktem CalDAV-Serververkehr auf NC33, NC34 und NC35 getestet**. Die restliche UI-/Client-Abnahme liegt vollständig in `docs/UI_CLIENT_ACCEPTANCE.md`. Verbleibt: gemeinsame UI-/Client-/Zeitzonen-/Rechte-Abnahme sowie P3 (Zertifikat, Signatur und App-Store-Eintrag). Bis zu deren Abschluss bleibt PR #1 ein Entwurf und darf nicht als stabiles App-Store-Release veröffentlicht werden. Beim Abschließen dieses Pakets erneut Ausgangs-/End-SHA, geänderte Dateien, Migrationen, ausgeführte Tests, PR/Release/ZIP und nächsten Schritt dokumentieren.
+
+
+**Testvorgabe vom 28.11.2026:** Auf ausdrücklichen Wunsch des Projektinhabers werden **keine neuen Tests auf Nextcloud 35** ausgeführt. Neue automatische Integrationstests ausschließlich auf **Nextcloud 33 und 34**. Frühere NC35-Ergebnisse bleiben historische Nachweise, aber keine Aufforderung zur erneuten Prüfung. Die Angabe unterstützter Versionen und die spätere Veröffentlichung sind davon getrennte Entscheidungen.

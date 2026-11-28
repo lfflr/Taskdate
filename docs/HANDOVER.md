@@ -113,6 +113,16 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 - Code-Stand mit der neuen Dienstanbindung: `f7a2a3839520e2cfc11b636a933b89a449947af8`; getesteter Workflow nach der `occ`-Syntaxkorrektur: `d91396c5cec0b7e73bb7e51e927dd67923bd5b5b`.
 - Keine Migrationen, kein Merge und keine Änderung an produktiven Daten. Kein Tag, ZIP oder signiertes App-Store-Release erstellt.
 
+## Relative Datumsangaben und Mehrfachspeicherung (28.11.2026)
+
+- `lib/TaskUpdatePlanner.php`: Bei `heute`, `morgen`, `übermorgen` und Wochentagen wird eine bereits von TaskDate verwaltete Fälligkeit bei erneuten PUTs **nicht** erneut relativ zum aktuellen Speicherdatum ausgewertet. Das verhindert stille Terminverschiebungen bei Bearbeitung oder Synchronisierung an Folgetagen. Eine absichtliche Änderung auf ein anderes relatives Wort löst vorerst keine automatische Neuberechnung aus (konservative Einschränkung).
+- `tests/task_update_planner_test.php`: fünf neue Randfälle für lokale Tagesgrenzen in `UTC`, `Europe/Berlin` und `America/New_York`; zusätzliche Fälle für spätere erneute Speicherung und Abgrenzung ähnlich klingender Wörter.
+- `tests/nextcloud35_e2e.sh`: echtes erneutes PUT/GET einer Aufgabe mit `morgen` und Vergleich der gespeicherten DUE vor/nach der Wiederholung.
+- Tatsächlich bestanden: [PHP-/SabreDAV-Testlauf #148](https://github.com/lfflr/Taskdate/actions/runs/46109844565) und [Nextcloud 33–35-Matrix #59](https://github.com/lfflr/Taskdate/actions/runs/46109799134) mit **3/3 erfolgreichen Versionen**.
+- Dokumentation in `README.md`, `docs/DEVELOPMENT_PLAN.md`, `docs/APPSTORE_RELEASE.md`, `docs/UI_CLIENT_ACCEPTANCE.md` aktualisiert.
+- Geprüfter Integrationscode: `ebe43ed90f8812f4130f5557fce13f587b53f8f4`; danach wurde der separate Planner-Test um spätere Wiederholungen erweitert (Commit `63726c5c892235dd5ff3b98878b8ab6277fa0555`), PHP-CI ebenfalls erfolgreich.
+- Keine Datenbankmigrationen, keine Berührung produktiver Daten, kein Merge und kein öffentliches Release.
+
 ## Noch offen / Abnahmekriterien
 
 - **Höchste Priorität:** Ergänzende Nextcloud-35-UI-/Client-Abnahme mit Tasks-Anlage/Bearbeitung, Kalenderdarstellung, geteilten Kalendern und externer Client-Synchronisation. Der automatische CalDAV-Server-Test hat die deklarative Plugineinbindung und den tatsächlichen `method:PUT`-Pfad für direkte HTTP-Clients bestätigt. Jetzt insbesondere prüfen, ob Nextcloud Tasks und externe Clients dieselben fachlichen Ergebnisse liefern.

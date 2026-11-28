@@ -84,17 +84,64 @@ class DateParser {
         $hasTime = false;
         if (preg_match('/(?<![\d.])(\d{1,2})[.:](\d{2})(?![\d.])/', $rest, $t)
             || preg_match('/(?<!\d)(\d{1,2})(?:[.:](\d{2}))?\s*Uhr\b/iu', $rest, $t)
-            // 4-stellig (z. B. 1400); nur volle/viertel Stunden, damit Jahre wie 2026 nicht passen
-            || preg_match('/(?<![\d.:])([01]\d|2[0-3])(00|15|30|45)(?![\d.:])/', $rest, $t)) {
+            // 4-stellig (z. B. 1400); Uhrzeiten mit beliebigen Minuten; Datum wird zuvor aus dem Text entfernt
+            || preg_match('/(?<![\d.:])([01]\d|2[0-3])([0-5]\d)(?![\d.:])/', $rest, $t)) {
             $h = (int)$t[1];
             $min = isset($t[2]) && $t[2] !== '' ? (int)$t[2] : 0;
             if ($h < 24 && $min < 60) {
+                if (!self::isSafeLocalTime($date, $h, $min)) {
+                    // A missing or doubled wall-clock hour is not a unique due time.
+                    return null;
+                }
                 $date = $date->setTime($h, $min);
                 $hasTime = true;
             }
         }
 
         return [$date, $hasTime];
+    }
+
+    /**
+     * Reject nonexistent and ambiguous wall-clock times on timezone changes.
+     * Otherwise PHP silently normalizes missing hours or chooses one
+     * of two possible instants. Fixed-offset zones have no such transitions.
+     */
+    public static function isSafeLocalTime(DateTimeImmutable $day, int $hour, int $minute): bool {
+        $candidate = $day->setTime($hour, $minute);
+        if ((int)$candidate->format('G') !== $hour
+            || (int)$candidate->format('i') !== $minute
+            || $candidate->format('Y-m-d') !== $day->format('Y-m-d')) {
+            return false;
+        }
+
+        $instant = $candidate->getTimestamp();
+        $transitions = $day->getTimezone()->getTransitions($instant - 172800, $instant + 172800);
+        if (!is_array($transitions)) {
+            return true;
+        }
+
+        $wallSeconds = gmmktime(
+            $hour,
+            $minute,
+            0,
+            (int)$day->format('n'),
+            (int)$day->format('j'),
+            (int)$day->format('Y')
+        );
+        $previousOffset = null;
+        foreach ($transitions as $transition) {
+            $newOffset = (int)$transition['offset'];
+            if ($previousOffset !== null && $newOffset < $previousOffset) {
+                // Clock moved backwards; wall time occurs twice.
+                $repeatedStart = (int)$transition['ts'] + $newOffset;
+                $repeatedEnd = (int)$transition['ts'] + $previousOffset;
+                if ($wallSeconds >= $repeatedStart && $wallSeconds < $repeatedEnd) {
+                    return false;
+                }
+            }
+            $previousOffset = $newOffset;
+        }
+        return true;
     }
 
     /** Entfernt nur die erkannte Uhrzeit; das Datum und der übrige Titel bleiben erhalten. */
@@ -104,7 +151,7 @@ class DateParser {
         $patterns = [
             '/(?<!\d)(\d{1,2})(?:[.:](\d{2}))?\s*Uhr\b/iu',
             '/(?<![\d.])(\d{1,2})[.:](\d{2})(?![\d.])/',
-            '/(?<![\d.:])([01]\d|2[0-3])(00|15|30|45)(?![\d.:])/',
+            '/(?<![\d.:])([01]\d|2[0-3])([0-5]\d)(?![\d.:])/',
         ];
         foreach ($patterns as $pattern) {
             if (!preg_match_all($pattern, $title, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {

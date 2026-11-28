@@ -1,0 +1,11 @@
+{
+  "name": "lfflr/taskdate-development",
+  "description": "Development-only SabreDAV integration test dependencies; never included in release packaging",
+  "type": "project",
+  "require-dev": {
+    "sabre/dav": "^4.7"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

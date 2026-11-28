@@ -5,12 +5,22 @@
     <name>Task Date</name>
     <summary>Setzt das Fälligkeitsdatum von Aufgaben automatisch aus dem Titel</summary>
     <description>Erkennt Datumsangaben im Aufgabentitel (z. B. "Zahnarzt 12.11.", "Bericht morgen 14 Uhr", "Steuer am Freitag") und trägt sie als Fälligkeitsdatum ein. Aufgaben mit Fälligkeit erscheinen auch im Kalender.</description>
-    <version>0.2.2</version>
-    <licence>agpl</licence>
-    <author>Du</author>
+    <version>0.2.3</version>
+    <licence>GPL-3.0-only</licence>
+    <author>lfflr</author>
     <namespace>TaskDate</namespace>
     <category>organization</category>
+    <types>
+        <dav/>
+    </types>
+    <sabre>
+        <plugins>
+            <plugin>OCA\TaskDate\Sabre\TaskDateSabrePlugin</plugin>
+        </plugins>
+    </sabre>
+    <website>https://github.com/lfflr/Taskdate</website>
+    <bugs>https://github.com/lfflr/Taskdate/issues</bugs>
     <dependencies>
-        <nextcloud min-version="33" max-version="35"/>
+        <nextcloud min-version="35" max-version="35"/>
     </dependencies>
 </info>

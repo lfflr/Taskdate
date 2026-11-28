@@ -1,0 +1,41 @@
+name: PHP checks
+on:
+  pull_request:
+    paths:
+      - 'appinfo/**'
+      - 'lib/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'composer.json'
+      - 'LICENSE'
+      - '.github/workflows/php-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax-and-parser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring
+          coverage: none
+      - name: PHP syntax
+        run: find lib tests -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Install dev-only SabreDAV dependencies
+        run: composer update --no-interaction --no-progress --prefer-dist
+      - name: Parser tests
+        run: php tests/date_parser_test.php
+      - name: Task update planner tests
+        run: php tests/task_update_planner_test.php
+      - name: Task write safety tests
+        run: php tests/task_write_policy_test.php
+      - name: SabreDAV PUT request tests
+        run: php tests/sabre_put_test.php
+      - name: Release staging smoke test
+        run: bash tests/release_staging_test.sh
+      - name: Verify static App Store release gate
+        run: bash scripts/check-release-blockers.sh

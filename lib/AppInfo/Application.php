@@ -3,14 +3,15 @@ declare(strict_types=1);
 
 namespace OCA\TaskDate\AppInfo;
 
-use OCP\Calendar\Events\CalendarObjectCreatedEvent;
-use OCP\Calendar\Events\CalendarObjectUpdatedEvent;
-use OCA\TaskDate\Listener\TaskDateListener;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
+/**
+ * DAV plugin registration lives in appinfo/info.xml (sabre/plugins).
+ * Nextcloud loads it for the normal authenticated CalDAV server.
+ */
 class Application extends App implements IBootstrap {
     public const APP_ID = 'taskdate';
 
@@ -19,8 +20,6 @@ class Application extends App implements IBootstrap {
     }
 
     public function register(IRegistrationContext $context): void {
-        $context->registerEventListener(CalendarObjectCreatedEvent::class, TaskDateListener::class);
-        $context->registerEventListener(CalendarObjectUpdatedEvent::class, TaskDateListener::class);
     }
 
     public function boot(IBootContext $context): void {

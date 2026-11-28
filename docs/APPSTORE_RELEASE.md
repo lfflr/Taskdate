@@ -59,6 +59,8 @@ Nachweise:
 
 **Testgrenzen:** Kein echter Nextcloud-Tasks-Browserlauf, kein externer CalDAV-Client, keine geteilten oder schreibgeschützten Kalender, keine MariaDB-/PostgreSQL-Datenbank und keine Zeitzonenübergänge. Der RRULE-Test bestätigt nur das bewusste Überspringen wiederkehrender Aufgaben, nicht ihre automatische Verarbeitung. Die CalDAV-Serverintegration wurde inzwischen zusätzlich auf Nextcloud 33 und 34 erfolgreich geprüft; Browser-/Drittclient-Kompatibilität bleibt offen.
 
+**Neuer Live-Nachweis (28.11.2026):** [CI-Matrix #31](https://github.com/lfflr/Taskdate/actions/runs/46104699628) erfolgreich auf Nextcloud 33, 34 und 35. Ergänzende direkte CalDAV-`PUT`/`GET`-Tests prüfen jetzt auf allen drei Versionen UTC-`DUE`, `DUE;TZID=Europe/Berlin` sowie das Beibehalten von `DESCRIPTION` bei der automatischen Titelanpassung. [PHP-/SabreDAV-Lauf #117](https://github.com/lfflr/Taskdate/actions/runs/46104699641) ebenfalls erfolgreich. Das ist ein Test des unveränderten Durchreichens zonierter Aufgaben, keine vollständige Zeitzonen-/DST-Implementierung. Ein externer Client und die Tasks-Weboberfläche sind weiterhin offen.
+
 ## 4. Gebündelte ergänzende Praxistests – Freigabegruppe A
 
 Die serverseitigen Standardfälle sind mit der isolierten Docker-Instanz bereits getestet. Für die verbleibende **UI-/Client-Abnahme** gemäß [UI_CLIENT_ACCEPTANCE.md](UI_CLIENT_ACCEPTANCE.md) nur auf einer **separaten Nextcloud-35-Testinstallation** mit Testkalender und mindestens einer Nutzer-Testkennung, bevor Produktivdaten verwendet werden:

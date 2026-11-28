@@ -128,7 +128,7 @@ Die echte Nextcloud-33–35-Serverintegration ist in isolierten Docker-Tests bes
 
 - `lib/TaskWritePolicy.php`: TaskDate verändert keine Aufgaben mit `COMPLETED`, mit `STATUS=COMPLETED`, `CANCELLED` oder `IN-PROCESS`, mit `DURATION`, `RDATE`, `EXDATE` sowie den bereits geschützten `DTSTART`, `RRULE` und `RECURRENCE-ID`. `NEEDS-ACTION` bleibt zulässig.
 - `tests/task_write_policy_test.php` und `tests/sabre_put_test.php` um die entsprechenden Fälle erweitert; **PHP-/SabreDAV-CI #166 erfolgreich:** https://github.com/lfflr/Taskdate/actions/runs/46148177404.
-- `tests/nextcloud35_e2e.sh`: echte CalDAV-PUT/GET-Fälle für Status `COMPLETED`, `CANCELLED` und `IN-PROCESS` hinzugefügt. **NC35-Lauf #80:** https://github.com/lfflr/Taskdate/actions/runs/46148177399; Ergebnis zum Zeitpunkt dieses Eintrags noch ausstehend.
+- `tests/nextcloud35_e2e.sh`: echte CalDAV-PUT/GET-Fälle für Status `COMPLETED`, `CANCELLED` und `IN-PROCESS` hinzugefügt. **NC35-Lauf #80 erfolgreich:** https://github.com/lfflr/Taskdate/actions/runs/46148177399; echte CalDAV-PUT/GET-Statusfälle bestanden.
 - Verbindlich: Nur Nextcloud 35 (oder nach separater Freigabe höher) testen; keine weiteren NC33-/NC34-Tests. `appinfo/info.xml`: min=35/max=35.
 - Keine produktiven Daten, keine Migrationen, kein Merge, Tag oder Release.
 

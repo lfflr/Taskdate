@@ -56,3 +56,11 @@ Der technische CalDAV-Serverteil von P2 ist auf Nextcloud 33, 34 und 35 bestande
 
 
 **Verbindliche Testvorgabe vom 28.11.2026 (Korrektur):** **Ausschließlich Nextcloud 35 oder höher** testen; **keine neuen Tests auf Nextcloud 33 oder 34**. Der CI-Workflow testet derzeit ausschließlich NC35. Nextcloud 36+ erst nach gesonderter Kompatibilitätsentscheidung testen und freigeben. In `appinfo/info.xml` ist die Mindestversion deshalb 35; `max-version=35` bleibt als vorsichtige Release-Grenze bestehen, bis höhere Versionen ausdrücklich geprüft sind. Frühere NC33/NC34-Prüfungen dienen ausschließlich als historische Nachweise, nicht als aktuelles Testziel.
+
+
+## NC35-CalDAV-Freigabeprüfung (28.11.2026)
+
+- Ergänzt in `tests/nextcloud35_e2e.sh`: echte freigegebene Kalender über das CalDAV-Share-Protokoll, zunächst lesend und ohne Schreibrecht, danach mit Les-/Schreibrecht; plus Lebenszyklus einer automatisch verwalteten Aufgabe von `NEEDS-ACTION` zu `COMPLETED` und `CANCELLED`.
+- Vorläufiger Prüfstand: **CI noch auszuwerten**, [NC35-Integration #86](https://github.com/lfflr/Taskdate/actions/runs/46153792979); keine Behauptung einer erfolgreichen Freigabe-Abnahme vor dem Testergebnis.
+- Ausschließlich Nextcloud 35; keine neuen Tests auf Nextcloud 33 oder 34; keine Freigabe von NC36.
+- Keine produktiven Daten oder Migrationen; `main`, PR-Draft und Veröffentlichung unverändert.

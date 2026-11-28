@@ -30,6 +30,13 @@ final class TaskUpdatePlanner {
             return null;
         }
 
+        // Relative dates must not drift whenever a client later resaves
+        // an already managed task. Without an original absolute anchor,
+        // today's/morrow's reference date cannot be safely reconstructed.
+        if ($managed && preg_match('/(?<![\\pL])(heute|morgen|übermorgen|uebermorgen)(?![\\pL])/iu', $summary) === 1) {
+            return null;
+        }
+
         $parsed = DateParser::parse($summary, $now);
         if ($parsed === null) {
             // Only remove a due date that TaskDate actually managed.

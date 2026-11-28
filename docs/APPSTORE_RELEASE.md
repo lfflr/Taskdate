@@ -129,4 +129,4 @@ Offizielle Nextcloud-Dokumentation:
 Zentrale Übergabe und weitere Meilensteine: [HANDOVER.md](HANDOVER.md) und [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md).
 
 
-**Testvorgabe vom 28.11.2026:** Auf ausdrücklichen Wunsch des Projektinhabers werden **keine neuen Tests auf Nextcloud 35** ausgeführt. Neue automatische Integrationstests ausschließlich auf **Nextcloud 33 und 34**. Frühere NC35-Ergebnisse bleiben historische Nachweise, aber keine Aufforderung zur erneuten Prüfung. Die Angabe unterstützter Versionen und die spätere Veröffentlichung sind davon getrennte Entscheidungen.
+**Verbindliche Testvorgabe vom 28.11.2026 (Korrektur):** **Ausschließlich Nextcloud 35 oder höher** testen; **keine neuen Tests auf Nextcloud 33 oder 34**. Der CI-Workflow testet derzeit ausschließlich NC35. Nextcloud 36+ erst nach gesonderter Kompatibilitätsentscheidung testen und freigeben. In `appinfo/info.xml` ist die Mindestversion deshalb 35; `max-version=35` bleibt als vorsichtige Release-Grenze bestehen, bis höhere Versionen ausdrücklich geprüft sind. Frühere NC33/NC34-Prüfungen dienen ausschließlich als historische Nachweise, nicht als aktuelles Testziel.

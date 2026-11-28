@@ -22,6 +22,10 @@ $cases = [
     ['Zahnarzt 261112', '20261112', '20261112', null],
     ['Zahnarzt 261113', '20261112', '20261112', ['due' => '20261113', 'summary' => 'Zahnarzt 261113']],
     ['Zahnarzt 261112 1530', null, '20261111', null], // manual DUE deletion
+    ['Termin 270328', '20270327T023000', '20270327T023000', null], // DST gap if time retained
+    ['Termin 271031', '20271030T023000', '20271030T023000', null], // DST overlap if time retained
+    ['Termin 270328', '20270327T013000', '20270327T013000', ['due' => '20270328T013000', 'summary' => 'Termin 270328']],
+    ['Termin 271031', '20271030T033000', '20271030T033000', ['due' => '20271031T033000', 'summary' => 'Termin 271031']],
 ];
 foreach ($cases as $i => [$summary, $due, $managedDue, $expected]) {
     $actual = TaskUpdatePlanner::plan($summary, $due, $managedDue, $now);

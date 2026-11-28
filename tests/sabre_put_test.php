@@ -15,7 +15,7 @@ use Sabre\HTTP\Request;
 use Sabre\HTTP\Response;
 use Sabre\VObject\Reader;
 
-$plugin = new TaskDateSabrePlugin();
+$plugin = new TaskDateSabrePlugin(static fn(): DateTimeZone => new DateTimeZone('Europe/Berlin'));
 $server = new Server();
 $server->addPlugin($plugin);
 if ($server->getPlugin('taskdate') !== $plugin) {
@@ -27,7 +27,7 @@ if ($server->getPlugin('taskdate') !== $plugin) {
 // beforeMethod:*, after the event listener list has already been assembled.
 // Our method:PUT listener must still be present for the subsequent method event.
 $lateServer = new Server();
-$latePlugin = new TaskDateSabrePlugin();
+$latePlugin = new TaskDateSabrePlugin(static fn(): DateTimeZone => new DateTimeZone('Europe/Berlin'));
 $lateServer->on('beforeMethod:*', static function () use ($lateServer, $latePlugin): void {
     $lateServer->addPlugin($latePlugin);
 }, 30);
@@ -64,7 +64,7 @@ function runPut(string $ics, string $path = 'calendars/alice/tasks/example.ics')
     $url = '/remote.php/dav/' . $path;
     $request = new Request('PUT', $url, ['Content-Type' => 'text/calendar'], $ics);
     $request->setBaseUrl('/remote.php/dav/');
-    $plugin = new TaskDateSabrePlugin();
+    $plugin = new TaskDateSabrePlugin(static fn(): DateTimeZone => new DateTimeZone('Europe/Berlin'));
     $plugin->handlePut($request, new Response());
     return [$request->getBodyAsString(), $request->getHeader('Content-Length')];
 }
@@ -137,7 +137,7 @@ foreach ($streamCases as $i => $input) {
         'Content-Length' => (string)strlen($input),
     ], $handle);
     $request->setBaseUrl('/remote.php/dav/');
-    (new TaskDateSabrePlugin())->handlePut($request, new Response());
+    (new TaskDateSabrePlugin(static fn(): DateTimeZone => new DateTimeZone('Europe/Berlin')))->handlePut($request, new Response());
     if ($request->getBodyAsString() !== $input) {
         throw new RuntimeException("Stream case $i lost original body");
     }
@@ -152,7 +152,7 @@ $request = new Request('PUT', '/remote.php/dav/calendars/alice/tasks/new.ics', [
     'Content-Type' => 'text/calendar', 'Content-Length' => (string)strlen($input),
 ], $stream);
 $request->setBaseUrl('/remote.php/dav/');
-(new TaskDateSabrePlugin())->handlePut($request, new Response());
+(new TaskDateSabrePlugin(static fn(): DateTimeZone => new DateTimeZone('Europe/Berlin')))->handlePut($request, new Response());
 if ((string)Reader::read($request->getBodyAsString())->VTODO->SUMMARY !== 'Stream test 261112') {
     throw new RuntimeException('Stream rewrite failed');
 }

@@ -39,6 +39,9 @@ Stand: 2026-11-27. Maßgebliche Übergabe: [HANDOVER.md](HANDOVER.md), ausführl
 
 - [x] Relative Datumsangaben über Benutzer-Mitternacht (UTC, Europe/Berlin, America/New_York) sowie der Schutz gegen späteres ungewolltes Verschieben bereits verwalteter `heute`-/`morgen`-/Wochentags-Aufgaben sind durch Planner-Regressionen [PHP-CI #148](https://github.com/lfflr/Taskdate/actions/runs/46109844565) bestanden. Der zusätzliche reale CalDAV-Repeat-PUT-Test ist in der [NC33–35-Matrix #59](https://github.com/lfflr/Taskdate/actions/runs/46109799134) auf allen drei Versionen erfolgreich.
 
+- [x] Im NC35-Entwicklungsbranch erweiterter Schutz für Aufgaben mit `COMPLETED`, `STATUS=COMPLETED/CANCELLED/IN-PROCESS`, `DURATION`, `RDATE` und `EXDATE` implementiert; `NEEDS-ACTION` bleibt zulässig. PHP-/SabreDAV-Tests bestanden: [CI #166](https://github.com/lfflr/Taskdate/actions/runs/46148177404).
+- [ ] Echter NC35-CalDAV-Test für `STATUS`-Schutz läuft: [NC35 #80](https://github.com/lfflr/Taskdate/actions/runs/46148177399). Erst nach abgeschlossenem Lauf als verifiziert markieren.
+
 ## P3: App-Store-Release – gebündelt nach Abnahme
 
 - [ ] Quellcode-Rechte prüfen, Icon/Screenshots finalisieren, erforderliche Metadaten vervollständigen.

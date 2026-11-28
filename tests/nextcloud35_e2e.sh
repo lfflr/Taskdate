@@ -179,6 +179,23 @@ for spec in "spring 270328" "fall 271031"; do
   echo "PASS: timezone-specific DST $label for Europe/Berlin versus UTC"
 done
 
+# Relative words remain in the title. Re-saving a previously auto-managed
+# task must never move DUE just because 'morgen' is evaluated on another day.
+make_ics "relative" "Relativ morgen 1405" ""
+put "relative" "$temp/relative.ics" "put-relative"
+fetch "relative" "relative-before.ics"
+grep -Fq 'X-TASKDATE-AUTO-DUE:' "$temp/relative-before.ics"
+grep -Fq 'DUE:' "$temp/relative-before.ics"
+put "relative" "$temp/relative-before.ics" "put-relative-again"
+fetch "relative" "relative-after.ics"
+before_due="$(grep '^DUE:' "$temp/relative-before.ics" | tr -d '\r')"
+after_due="$(grep '^DUE:' "$temp/relative-after.ics" | tr -d '\r')"
+if test "$before_due" != "$after_due"; then
+  echo "FAIL: relative date shifted on repeat PUT" >&2
+  exit 1
+fi
+echo "PASS: relative due date remains stable on repeat PUT"
+
 # A stale ETag must not overwrite the task.
 http="$(curl -sS -u "$user:$pass" -X PUT -H 'Content-Type: text/calendar' \
   -H 'If-Match: "definitely-stale-etag"' \

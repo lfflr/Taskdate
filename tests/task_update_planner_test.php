@@ -58,4 +58,19 @@ foreach ($relativeCases as [$timezone, $summary, $expectedDue]) {
     }
 }
 
+
+// A task first created with 'morgen' must not drift when it is saved again
+// on the following day or week.
+$later = new DateTimeImmutable('2026-11-14 08:00:00', new DateTimeZone('Europe/Berlin'));
+foreach ([
+    ['Erinnerung morgen', '20261111T140500'],
+    ['Termin Montag', '20261116T090000'],
+    ['Heute notieren', '20261110T090000'],
+] as [$summary, $originalDue]) {
+    $result = TaskUpdatePlanner::plan($summary, $originalDue, $originalDue, $later);
+    if ($result !== null) {
+        throw new RuntimeException('Relative due date drifted after later save: ' . $summary);
+    }
+}
+
 echo 'TaskUpdatePlanner: ' . count($cases) . ' scenarios plus ' . count($relativeCases) . " user-local midnight cases passed\n";
